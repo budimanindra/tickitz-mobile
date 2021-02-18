@@ -99,7 +99,6 @@ const style = StyleSheet.create({
     marginBottom: 41,
   },
   form: {
-    // flex: 1,
     borderRadius: 4,
     borderWidth: 1,
     backgroundColor: '#FCFDFE',
@@ -125,7 +124,7 @@ const style = StyleSheet.create({
     lineHeight: 15,
   },
   clickableText: {
-    color: 'blue',
+    color: '#5F2EEA',
   },
 });
 

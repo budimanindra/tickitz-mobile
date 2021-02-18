@@ -125,7 +125,7 @@ const style = StyleSheet.create({
     lineHeight: 15,
   },
   clickableText: {
-    color: 'blue',
+    color: '#5F2EEA',
   },
 });
 

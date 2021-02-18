@@ -6,6 +6,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import Register from './screens/Register';
 import Login from './screens/Login';
 import ForgotPassword from './screens/ForgotPassword';
+import Home from './screens/Home';
 
 const Stack = createStackNavigator();
 
@@ -13,7 +14,7 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen
+        {/* <Stack.Screen
           component={Register}
           options={{headerShown: false}}
           name="Register"
@@ -27,6 +28,11 @@ const App = () => {
           component={ForgotPassword}
           options={{headerShown: false}}
           name="ForgotPassword"
+        /> */}
+        <Stack.Screen
+          component={Home}
+          options={{headerShown: false}}
+          name="Home"
         />
       </Stack.Navigator>
     </NavigationContainer>
