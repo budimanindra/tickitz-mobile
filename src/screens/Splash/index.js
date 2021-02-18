@@ -1,15 +1,10 @@
 import React from 'react';
 import {View, Text} from 'react-native';
 
-const Splash = ({navigation}) => {
-  useEffect(() => {
-    setTimeout(() => {
-      navigation.replace('Register');
-    }, 3000);
-  });
+const Splash = () => {
   return (
     <View>
-      <Text>Splash Screen</Text>
+      <Text />
     </View>
   );
 };
