@@ -7,6 +7,7 @@ import Register from './screens/Register';
 import Login from './screens/Login';
 import ForgotPassword from './screens/ForgotPassword';
 import Home from './screens/Home';
+import MovieDetails from './screens/MovieDetails';
 
 const Stack = createStackNavigator();
 
@@ -29,10 +30,15 @@ const App = () => {
           options={{headerShown: false}}
           name="ForgotPassword"
         /> */}
-        <Stack.Screen
+        {/* <Stack.Screen
           component={Home}
           options={{headerShown: false}}
           name="Home"
+        /> */}
+        <Stack.Screen
+          component={MovieDetails}
+          options={{headerShown: false}}
+          name="MovieDetails"
         />
       </Stack.Navigator>
     </NavigationContainer>
