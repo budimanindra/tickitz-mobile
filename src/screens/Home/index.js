@@ -9,11 +9,16 @@ import {
   ScrollView,
 } from 'react-native';
 
+import {Navbar} from '../../components/Navbar';
+import Footer from '../../components/Footer';
+
 class Home extends Component {
   state = {};
   render() {
     return (
       <ScrollView>
+        <Navbar />
+
         <View style={style.container}>
           <View>
             <Text style={style.slogan}>Nearest Cinema, Newest Movie,</Text>
@@ -70,7 +75,9 @@ class Home extends Component {
             <ScrollView
               horizontal={true}
               showsHorizontalScrollIndicator={false}>
-              <TouchableOpacity style={button.card}>
+              <TouchableOpacity
+                onPress={() => this.props.navigation.navigate('MovieDetails')}
+                style={button.card}>
                 <View>
                   <Image
                     source={{
@@ -148,7 +155,7 @@ class Home extends Component {
                   <Image
                     source={{
                       uri:
-                        'https://xl.movieposterdb.com/20_06/2021/11377298/xl_11377298_d3e48752.jpg',
+                        'https://xl.movieposterdb.com/13_04/2012/1872220/xl_1872220_93384bc9.jpg',
                     }}
                     style={button.moviePoster}
                   />
@@ -166,7 +173,7 @@ class Home extends Component {
                   <Image
                     source={{
                       uri:
-                        'https://xl.movieposterdb.com/20_06/2021/11377298/xl_11377298_d3e48752.jpg',
+                        'https://xl.movieposterdb.com/08_05/2008/960144/xl_960144_6e34666b.jpg',
                     }}
                     style={button.moviePoster}
                   />
@@ -184,7 +191,7 @@ class Home extends Component {
                   <Image
                     source={{
                       uri:
-                        'https://xl.movieposterdb.com/20_06/2021/11377298/xl_11377298_d3e48752.jpg',
+                        'https://xl.movieposterdb.com/10_08/2009/1187043/xl_1187043_42141756.jpg',
                     }}
                     style={button.moviePoster}
                   />
@@ -261,6 +268,7 @@ class Home extends Component {
           </View>
         </View>
         {/* Moviegoers End   */}
+        <Footer />
       </ScrollView>
     );
   }
@@ -380,7 +388,7 @@ const button = StyleSheet.create({
     width: 94.82,
     height: 311.98,
     borderRadius: 10,
-    elevation: 4,
+    // elevation: 4,
   },
   card: {
     marginTop: 48,

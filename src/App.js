@@ -8,9 +8,10 @@ import Login from './screens/Login';
 import ForgotPassword from './screens/ForgotPassword';
 import Home from './screens/Home';
 import MovieDetails from './screens/MovieDetails';
-import OrderPage from './screens/OrderPage';
+import PaymentPage from './screens/PaymentPage';
 import TicketResults from './screens/TicketResults';
-import DateTimePicker from './components/DateTimePicker';
+import OrderPage from './screens/OrderPage';
+import Footer from './components/Footer';
 
 const Stack = createStackNavigator();
 
@@ -18,16 +19,6 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen
-          component={OrderPage}
-          options={{headerShown: false}}
-          name="OrderPage"
-        />
-        <Stack.Screen
-          component={TicketResults}
-          options={{headerShown: false}}
-          name="TicketResults"
-        />
         <Stack.Screen
           component={Register}
           options={{headerShown: false}}
@@ -43,21 +34,31 @@ const App = () => {
           options={{headerShown: false}}
           name="ForgotPassword"
         />
-        {/* <Stack.Screen
+        <Stack.Screen
+          component={OrderPage}
+          options={{headerShown: false}}
+          name="OrderPage"
+        />
+        <Stack.Screen
           component={Home}
           options={{headerShown: false}}
           name="Home"
-        /> */}
-        {/* <Stack.Screen
+        />
+        <Stack.Screen
+          component={PaymentPage}
+          options={{headerShown: false}}
+          name="PaymentPage"
+        />
+        <Stack.Screen
+          component={TicketResults}
+          options={{headerShown: false}}
+          name="TicketResults"
+        />
+        <Stack.Screen
           component={MovieDetails}
           options={{headerShown: false}}
           name="MovieDetails"
-        /> */}
-        {/* <Stack.Screen
-          component={DateTimePicker}
-          options={{headerShown: false}}
-          name="DateTimePicker"
-        /> */}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

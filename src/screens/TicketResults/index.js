@@ -9,6 +9,9 @@ import {
   TextInput,
 } from 'react-native';
 
+import {Navbar} from '../../components/Navbar';
+import Footer from '../../components/Footer';
+
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import Success from '../../assets/success.png';
@@ -18,6 +21,7 @@ export class TicketResults extends Component {
   render() {
     return (
       <ScrollView>
+        <Navbar />
         <View style={style.container}>
           <View style={style.sectionCard}>
             <View style={style.centerDirection}>
@@ -72,6 +76,7 @@ export class TicketResults extends Component {
             </View>
           </View>
         </View>
+        <Footer />
       </ScrollView>
     );
   }
