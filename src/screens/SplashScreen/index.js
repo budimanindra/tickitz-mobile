@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, ImageBackground, StyleSheet, Image, Text} from 'react-native';
+import {View, StyleSheet, Image} from 'react-native';
 import Logo from '../../assets/V1-Signup.png';
 
 function SplashScreen({navigation}) {
@@ -7,11 +7,6 @@ function SplashScreen({navigation}) {
         navigation.replace('Register');
     }, 2000);
     return (
-        // <ImageBackground
-        //     style={{flex: 1}}
-        //     source={require('../../assets/Tickitz.png')}>
-        //     <Text>Indra</Text>
-        // </ImageBackground>
         <View style={style.center}>
             <Image source={Logo} />
         </View>
