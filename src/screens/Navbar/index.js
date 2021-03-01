@@ -12,13 +12,21 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 import Logo from '../../assets/V1-Signup.png';
 
-export class Navbar extends Component {
+import {connect} from 'react-redux';
+
+import {logout} from '../../redux/actions/auth';
+
+class Navbar extends Component {
     state = {
         collapsed: true,
     };
 
     toogleExpanded = () => {
         this.setState({collapsed: !this.state.collapsed});
+    };
+
+    doLogout = async () => {
+        await this.props.logout();
     };
 
     render() {
@@ -36,9 +44,7 @@ export class Navbar extends Component {
             <View>
                 <View style={header}>
                     <TouchableOpacity
-                        onPress={() =>
-                            this.props.navigation.navigate('ForgotPassword')
-                        }>
+                        onPress={() => this.props.navigation.navigate('Home')}>
                         <View>
                             <Image source={Logo} />
                         </View>
@@ -76,6 +82,27 @@ export class Navbar extends Component {
                     <View style={content}>
                         <TouchableOpacity>
                             <Text>Buy Ticket</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={content}>
+                        <TouchableOpacity
+                            onPress={() =>
+                                this.props.navigation.navigate('Profile')
+                            }>
+                            <Text>Account Profile</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={content}>
+                        <TouchableOpacity
+                            onPress={() =>
+                                this.props.navigation.navigate('AdminPage')
+                            }>
+                            <Text>Admin Page</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={content}>
+                        <TouchableOpacity onPress={this.doLogout}>
+                            <Text>Log Out</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={trademark}>
@@ -149,3 +176,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
 });
+
+const mapStateToProps = (state) => ({auth: state.auth});
+
+const mapDispatchToProps = {logout};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Navbar);

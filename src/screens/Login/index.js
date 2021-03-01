@@ -9,16 +9,28 @@ import {
     ScrollView,
 } from 'react-native';
 
+import {connect} from 'react-redux';
+
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import Logo from '../../assets/V1-Signup.png';
 import GoogleIcon from '../../assets/icon-google.png';
 import FbIcon from '../../assets/icon-facebook.png';
 
+import {login} from '../../redux/actions/auth';
+
 class Login extends Component {
     state = {
         visible: true,
+        email: '',
+        password: '',
     };
+
+    doLogin = async () => {
+        const {email, password} = this.state;
+        await this.props.login(email, password);
+    };
+
     render() {
         return (
             <ScrollView>
@@ -34,6 +46,7 @@ class Login extends Component {
                             style={style.form}
                             keyboardType="email-address"
                             placeholder="write your email"
+                            onChangeText={(email) => this.setState({email})}
                         />
                     </View>
 
@@ -43,6 +56,9 @@ class Login extends Component {
                             style={style.textInput}
                             placeholder="write your password"
                             secureTextEntry={this.state.visible}
+                            onChangeText={(password) =>
+                                this.setState({password})
+                            }
                         />
                         <TouchableOpacity
                             onPress={() =>
@@ -52,8 +68,11 @@ class Login extends Component {
                         </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity
-                        onPress={() => this.props.navigation.navigate('Home')}>
+                    <Text style={style.alertText}>
+                        {this.props.auth.errorMsg}
+                    </Text>
+
+                    <TouchableOpacity onPress={this.doLogin}>
                         <View style={button.primary}>
                             <Text style={button.text}>Sign in</Text>
                         </View>
@@ -135,6 +154,13 @@ const style = StyleSheet.create({
     clickableText: {
         color: '#5F2EEA',
     },
+    alertText: {
+        color: '#fd1c5f',
+        fontWeight: 'bold',
+        marginBottom: 10,
+        marginTop: -10,
+        borderRadius: 5,
+    },
 });
 
 const button = StyleSheet.create({
@@ -170,4 +196,8 @@ const button = StyleSheet.create({
     },
 });
 
-export default Login;
+const mapStateToProps = (state) => ({auth: state.auth});
+
+const mapDispatchToProps = {login};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

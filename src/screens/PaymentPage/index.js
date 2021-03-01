@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-import {Navbar} from '../../components/Navbar';
 import Footer from '../../components/Footer';
 
 import Paydana from '../../assets/paydana.png';
@@ -24,7 +23,6 @@ export class PaymentPage extends Component {
     render() {
         return (
             <ScrollView>
-                <Navbar />
                 <View style={style.containerPayment}>
                     <View style={style.contentDirectionBetween}>
                         <Text style={style.textPayment}>Total Payment </Text>

@@ -9,16 +9,28 @@ import {
     ScrollView,
 } from 'react-native';
 
+import {connect} from 'react-redux';
+
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import Logo from '../../assets/V1-Signup.png';
 import GoogleIcon from '../../assets/icon-google.png';
 import FbIcon from '../../assets/icon-facebook.png';
 
+import {register} from '../../redux/actions/auth';
+
 class Register extends Component {
     state = {
         visible: true,
+        email: '',
+        password: '',
     };
+
+    doRegister = async () => {
+        const {email, password} = this.state;
+        await this.props.register(email, password);
+    };
+
     render() {
         return (
             <ScrollView>
@@ -34,6 +46,7 @@ class Register extends Component {
                             style={style.form}
                             keyboardType="email-address"
                             placeholder="write your email"
+                            onChangeText={(email) => this.setState({email})}
                         />
                     </View>
 
@@ -43,6 +56,9 @@ class Register extends Component {
                             style={style.textInput}
                             placeholder="write your password"
                             secureTextEntry={this.state.visible}
+                            onChangeText={(password) =>
+                                this.setState({password})
+                            }
                         />
                         <TouchableOpacity
                             onPress={() =>
@@ -52,7 +68,11 @@ class Register extends Component {
                         </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity>
+                    <Text style={style.alertText}>
+                        {this.props.auth.errorMsg}
+                    </Text>
+
+                    <TouchableOpacity onPress={this.doRegister}>
                         <View style={button.primary}>
                             <Text style={button.text}>Join for free</Text>
                         </View>
@@ -133,6 +153,13 @@ const style = StyleSheet.create({
     clickableText: {
         color: '#5F2EEA',
     },
+    alertText: {
+        color: '#fd1c5f',
+        fontWeight: 'bold',
+        marginBottom: 10,
+        marginTop: -10,
+        borderRadius: 5,
+    },
 });
 
 const button = StyleSheet.create({
@@ -168,4 +195,8 @@ const button = StyleSheet.create({
     },
 });
 
-export default Register;
+const mapStateToProps = (state) => ({auth: state.auth});
+
+const mapDispatchToProps = {register};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Register);

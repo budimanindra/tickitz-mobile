@@ -8,34 +8,112 @@ import {
     Image,
 } from 'react-native';
 
-import {Navbar} from '../../components/Navbar';
 import Footer from '../../components/Footer';
-
+import {connect} from 'react-redux';
+import {
+    getMovie,
+    getShowDate,
+    getShowLocation,
+    getAvailCinema,
+} from '../../redux/actions/movie';
 import Sponsor1 from '../../assets/sponsor1.png';
+import http from '../../helpers/http';
 
 export class MovieDetails extends Component {
-    state = {};
+    state = {
+        selectedDate: null,
+        selectedLocation: null,
+        selectedShowtime: null,
+        finish: false,
+    };
+
+    movieDetailFormat = (data) => {
+        const releaseDatetime = data.releaseDate.split('T');
+        const endDatetime = data.endDate.split('T');
+        data.releaseDate = releaseDatetime[0];
+        data.endDate = endDatetime[0];
+        const durationTime = data.duration.split(':');
+        data.duration = `${Number(durationTime[0])} hours ${
+            durationTime[1]
+        } minutes`;
+        return data;
+    };
+
+    // generateListDate = (data) => {
+    //     let listDate = [];
+    //     let releaseDate = data.releaseDate;
+    //     let endDate = data.endDate;
+    //     let strDate = releaseDate;
+    //     let index = 1;
+    //     let dateMove = new Date(releaseDate);
+
+    //     while (strDate < endDate) {
+    //         strDate = dateMove.toISOString().slice(0, 10);
+    //         let dateObject = {id: index, readable: strDate};
+    //         listDate.push(dateObject);
+    //         dateMove.setDate(dateMove.getDate() + 1);
+    //         index++;
+    //     }
+    //     return listDate;
+    // };
+
+    async componentDidMount() {
+        const {movieId} = this.props.route.params;
+        const resultsDetailMovie = await http().get(`/movies/${movieId}`);
+        console.log(resultsDetailMovie);
+        const dataMovie = this.movieDetailFormat(
+            resultsDetailMovie.data.results,
+        );
+        this.props.getMovie(dataMovie);
+
+        // const showDate = this.generateListDate(dataMovie);
+        // this.props.getShowDate(showDate);
+
+        // const resultsCity = await http().get('/cities');
+        // this.props.getShowLocation(resultsCity.data.results);
+    }
+
+    getCinemaByCondition = async (id, date, city) => {
+        // const resultsCinema = await http().get(
+        //     `/cinemas?id=${id}&date=${date}&city=${city}`,
+        // );
+        // this.props.getAvailCinema(resultsCinema.data.results);
+    };
+
+    componentDidUpdate() {
+        // const {selectedDate, selectedLocation, finish} = this.state;
+        // if (selectedDate !== null && selectedLocation !== null && !finish) {
+        //     this.setState({finish: true}, () => {
+        //         this.getCinemaByCondition(
+        //             this.props.movie.details.id,
+        //             this.props.movie.showDate[Number(selectedDate) - 1]
+        //                 .readable,
+        //             this.props.movie.showLocation[Number(selectedLocation) - 1]
+        //                 .name,
+        //         );
+        //     });
+        // }
+    }
+
     render() {
         return (
             <ScrollView>
-                <Navbar />
                 <View style={style.container}>
                     {/* Card Start */}
                     <View style={style.cardAlign}>
                         <View style={style.card}>
                             <Image
                                 source={{
-                                    uri:
-                                        'https://xl.movieposterdb.com/13_02/2001/241527/xl_241527_da927a3d.jpg',
+                                    uri: this.props.movie.details.image,
                                 }}
                                 style={style.moviePoster}
                             />
                         </View>
                         <Text style={text.MovieTitle}>
-                            Harry Potter: Harry Potter and the Sorcerer's
+                            {this.props.movie.details.name}
                         </Text>
                         <Text style={text.MovieGenre}>
-                            Adventure, Family, Fantasy
+                            {this.props.movie.details.genreName}
                         </Text>
                     </View>
                     {/* Card End */}
@@ -47,7 +125,7 @@ export class MovieDetails extends Component {
                                 Release date
                             </Text>
                             <Text style={text.MovieSpecificationValue}>
-                                November 16, 2001
+                                {this.props.movie.details.releaseDate}
                             </Text>
                         </View>
                         <View style={text.MovieSpecificationFlex}>
@@ -55,7 +133,7 @@ export class MovieDetails extends Component {
                                 Directed by
                             </Text>
                             <Text style={text.MovieSpecificationValue}>
-                                Chris Colombus
+                                {this.props.movie.details.directedBy}
                             </Text>
                         </View>
                     </View>
@@ -65,7 +143,7 @@ export class MovieDetails extends Component {
                                 Duration
                             </Text>
                             <Text style={text.MovieSpecificationValue}>
-                                2 hrs 13 min
+                                {this.props.movie.details.duration}
                             </Text>
                         </View>
                         <View style={text.MovieSpecificationFlex}>
@@ -73,7 +151,7 @@ export class MovieDetails extends Component {
                                 Casts
                             </Text>
                             <Text style={text.MovieSpecificationValue}>
-                                Daniel Radcliffe, Emma Watson, Rupert Grint
+                                {this.props.movie.details.castName}
                             </Text>
                         </View>
                     </View>
@@ -83,12 +161,11 @@ export class MovieDetails extends Component {
                     {/* Synopsis Start */}
                     <Text style={text.synopsisTitle}>Synopsis</Text>
                     <Text style={text.synopsisContent}>
-                        An orphaned boy enrolls in a school of wizardry, where
-                        he learns the truth about himself, his family and the
-                        terrible evil that haunts the magical world.
+                        {this.props.movie.details.synopsis}
                     </Text>
                     {/* Synopsis End */}
                 </View>
+
                 <View style={style.container2} />
 
                 <View style={style.container3}>
@@ -291,4 +368,15 @@ const button = StyleSheet.create({
     },
 });
 
-export default MovieDetails;
+const mapStateToProps = (state) => ({
+    movie: state.movie,
+});
+
+const mapDispatchToProps = {
+    getMovie,
+    getShowDate,
+    getShowLocation,
+    getAvailCinema,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(MovieDetails);

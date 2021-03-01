@@ -9,16 +9,55 @@ import {
     ScrollView,
 } from 'react-native';
 
-import {Navbar} from '../../components/Navbar';
+import http from '../../helpers/http';
+
 import Footer from '../../components/Footer';
 
 class Home extends Component {
-    state = {};
+    state = {
+        errorMsg: '',
+        showing: [{}],
+        upcoming: [{}],
+    };
+
+    getMoviesShowing = async () => {
+        try {
+            const result = await http().get('/movies/now-showing');
+            this.setState({
+                errorMsg: '',
+                showing: result.data.results,
+            });
+        } catch (err) {
+            this.setState({
+                errorMsg: err.response.message,
+                showing: {},
+            });
+        }
+    };
+
+    getMoviesUpcoming = async () => {
+        try {
+            const result = await http().get('/movies/upcoming-movies');
+            this.setState({
+                errorMsg: '',
+                upcoming: result.data.results,
+            });
+        } catch (err) {
+            this.setState({
+                errorMsg: err.response.message,
+                upcoming: {},
+            });
+        }
+    };
+
+    componentDidMount() {
+        this.getMoviesShowing();
+        this.getMoviesUpcoming();
+    }
+
     render() {
         return (
             <ScrollView>
-                <Navbar />
-
                 <View style={style.container}>
                     <View>
                         <Text style={style.slogan}>
@@ -77,67 +116,28 @@ class Home extends Component {
                         <ScrollView
                             horizontal={true}
                             showsHorizontalScrollIndicator={false}>
-                            <TouchableOpacity
-                                onPress={() =>
-                                    this.props.navigation.navigate(
-                                        'MovieDetails',
-                                    )
-                                }
-                                style={button.card}>
-                                <View>
-                                    <Image
-                                        source={{
-                                            uri:
-                                                'https://xl.movieposterdb.com/13_02/2001/241527/xl_241527_da927a3d.jpg',
-                                        }}
-                                        style={button.moviePoster}
-                                    />
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={button.card}>
-                                <View>
-                                    <Image
-                                        source={{
-                                            uri:
-                                                'https://xl.movieposterdb.com/11_08/2002/295297/xl_295297_6be2c5d1.jpg',
-                                        }}
-                                        style={button.moviePoster}
-                                    />
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={button.card}>
-                                <View>
-                                    <Image
-                                        source={{
-                                            uri:
-                                                'https://xl.movieposterdb.com/11_09/2004/304141/xl_304141_11ace17d.jpg',
-                                        }}
-                                        style={button.moviePoster}
-                                    />
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={button.card}>
-                                <View>
-                                    <Image
-                                        source={{
-                                            uri:
-                                                'https://xl.movieposterdb.com/11_08/2005/330373/xl_330373_aa65749b.jpg',
-                                        }}
-                                        style={button.moviePoster}
-                                    />
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={button.card}>
-                                <View>
-                                    <Image
-                                        source={{
-                                            uri:
-                                                'https://xl.movieposterdb.com/07_11/2007/373889/xl_373889_a5d65b89.jpg',
-                                        }}
-                                        style={button.moviePoster}
-                                    />
-                                </View>
-                            </TouchableOpacity>
+                            {this.state.showing.map((movie) => (
+                                <TouchableOpacity
+                                    key={`Now Showing Movie: ${movie.id}`}
+                                    onPress={() =>
+                                        this.props.navigation.navigate(
+                                            'MovieDetails',
+                                            {
+                                                movieId: movie.id,
+                                            },
+                                        )
+                                    }
+                                    style={button.card}>
+                                    <View>
+                                        <Image
+                                            source={{
+                                                uri: movie.image,
+                                            }}
+                                            style={button.moviePoster}
+                                        />
+                                    </View>
+                                </TouchableOpacity>
+                            ))}
                         </ScrollView>
                     </View>
                 </View>
@@ -156,126 +156,52 @@ class Home extends Component {
                         <ScrollView
                             horizontal={true}
                             showsHorizontalScrollIndicator={false}>
-                            <TouchableOpacity style={button.card}>
-                                <View>
-                                    <Image
-                                        source={{
-                                            uri:
-                                                'https://xl.movieposterdb.com/13_04/2012/1872220/xl_1872220_93384bc9.jpg',
-                                        }}
-                                        style={button.moviePoster}
-                                    />
-                                    <Text style={style.movieTitle}>
-                                        Castle Falls
-                                    </Text>
-                                    <Text style={style.movieGenre}>
-                                        Action, Adventure
-                                    </Text>
-                                    <TouchableOpacity>
-                                        <View style={button.secondary}>
-                                            <Text style={button.textSecondary}>
-                                                Details
-                                            </Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={button.card}>
-                                <View>
-                                    <Image
-                                        source={{
-                                            uri:
-                                                'https://xl.movieposterdb.com/08_05/2008/960144/xl_960144_6e34666b.jpg',
-                                        }}
-                                        style={button.moviePoster}
-                                    />
-                                    <Text style={style.movieTitle}>
-                                        Castle Falls
-                                    </Text>
-                                    <Text style={style.movieGenre}>
-                                        Action, Adventure
-                                    </Text>
-                                    <TouchableOpacity>
-                                        <View style={button.secondary}>
-                                            <Text style={button.textSecondary}>
-                                                Details
-                                            </Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={button.card}>
-                                <View>
-                                    <Image
-                                        source={{
-                                            uri:
-                                                'https://xl.movieposterdb.com/10_08/2009/1187043/xl_1187043_42141756.jpg',
-                                        }}
-                                        style={button.moviePoster}
-                                    />
-                                    <Text style={style.movieTitle}>
-                                        Castle Falls
-                                    </Text>
-                                    <Text style={style.movieGenre}>
-                                        Action, Adventure
-                                    </Text>
-                                    <TouchableOpacity>
-                                        <View style={button.secondary}>
-                                            <Text style={button.textSecondary}>
-                                                Details
-                                            </Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={button.card}>
-                                <View>
-                                    <Image
-                                        source={{
-                                            uri:
-                                                'https://xl.movieposterdb.com/20_06/2021/11377298/xl_11377298_d3e48752.jpg',
-                                        }}
-                                        style={button.moviePoster}
-                                    />
-                                    <Text style={style.movieTitle}>
-                                        Castle Falls
-                                    </Text>
-                                    <Text style={style.movieGenre}>
-                                        Action, Adventure
-                                    </Text>
-                                    <TouchableOpacity>
-                                        <View style={button.secondary}>
-                                            <Text style={button.textSecondary}>
-                                                Details
-                                            </Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={button.card}>
-                                <View>
-                                    <Image
-                                        source={{
-                                            uri:
-                                                'https://xl.movieposterdb.com/20_06/2021/11377298/xl_11377298_d3e48752.jpg',
-                                        }}
-                                        style={button.moviePoster}
-                                    />
-                                    <Text style={style.movieTitle}>
-                                        Castle Falls
-                                    </Text>
-                                    <Text style={style.movieGenre}>
-                                        Action, Adventure
-                                    </Text>
-                                    <TouchableOpacity>
-                                        <View style={button.secondary}>
-                                            <Text style={button.textSecondary}>
-                                                Details
-                                            </Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                </View>
-                            </TouchableOpacity>
+                            {this.state.upcoming.map((movie) => (
+                                <TouchableOpacity
+                                    key={`Upcoming Movie: ${movie.id}`}
+                                    onPress={() =>
+                                        this.props.navigation.navigate(
+                                            'MovieDetails',
+                                            {
+                                                movieId: movie.id,
+                                            },
+                                        )
+                                    }
+                                    style={button.card}>
+                                    <View>
+                                        <Image
+                                            source={{
+                                                uri: movie.image,
+                                            }}
+                                            style={button.moviePoster}
+                                        />
+                                        <Text style={style.movieTitle}>
+                                            {movie.name}
+                                        </Text>
+                                        <Text style={style.movieGenre}>
+                                            {movie.genreName}
+                                        </Text>
+                                        <TouchableOpacity
+                                            onPress={() =>
+                                                this.props.navigation.navigate(
+                                                    'MovieDetails',
+                                                    {
+                                                        movieId: movie.id,
+                                                    },
+                                                )
+                                            }>
+                                            <View style={button.secondary}>
+                                                <Text
+                                                    style={
+                                                        button.textSecondary
+                                                    }>
+                                                    Details
+                                                </Text>
+                                            </View>
+                                        </TouchableOpacity>
+                                    </View>
+                                </TouchableOpacity>
+                            ))}
                         </ScrollView>
                     </View>
                 </View>
