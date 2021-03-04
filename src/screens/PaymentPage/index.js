@@ -7,6 +7,7 @@ import {
     Image,
     ScrollView,
     TextInput,
+    TouchableHighlight,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -20,6 +21,23 @@ import Paypaypal from '../../assets/paypaypal.png';
 import Payvisa from '../../assets/payvisa.png';
 
 export class PaymentPage extends Component {
+    state = {
+        selected: null,
+        selectedButton: '',
+        fullName: '',
+        email: '',
+        phoneNumber: '',
+    };
+
+    _handleClick(button) {
+        this.setState({selectedButton: button});
+    }
+
+    doPay = async () => {
+        const {fullName, email, phoneNumber} = this.state;
+        this.props.navigation.navigate('TicketResults');
+    };
+
     render() {
         return (
             <ScrollView>
@@ -35,24 +53,42 @@ export class PaymentPage extends Component {
 
                     <View style={style.sectionCard}>
                         <View style={style.contentDirection}>
-                            <TouchableOpacity>
-                                <View style={button.payment}>
+                            <TouchableOpacity
+                                onPress={() => this._handleClick('Dana')}>
+                                <View
+                                    style={
+                                        this.state.selectedButton === 'Dana'
+                                            ? button.paymentActive
+                                            : button.payment
+                                    }>
                                     <Image
                                         style={button.imageDana}
                                         source={Paydana}
                                     />
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity>
-                                <View style={button.payment}>
+                            <TouchableOpacity
+                                onPress={() => this._handleClick('Gopay')}>
+                                <View
+                                    style={
+                                        this.state.selectedButton === 'Gopay'
+                                            ? button.paymentActive
+                                            : button.payment
+                                    }>
                                     <Image
                                         style={button.imageGopay}
                                         source={Paygopay}
                                     />
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity>
-                                <View style={button.payment}>
+                            <TouchableOpacity
+                                onPress={() => this._handleClick('Gpay')}>
+                                <View
+                                    style={
+                                        this.state.selectedButton === 'Gpay'
+                                            ? button.paymentActive
+                                            : button.payment
+                                    }>
                                     <Image
                                         style={button.imageGpay}
                                         source={Paygpay}
@@ -62,24 +98,42 @@ export class PaymentPage extends Component {
                         </View>
 
                         <View style={style.contentDirection}>
-                            <TouchableOpacity>
-                                <View style={button.payment}>
+                            <TouchableOpacity
+                                onPress={() => this._handleClick('Ovo')}>
+                                <View
+                                    style={
+                                        this.state.selectedButton === 'Ovo'
+                                            ? button.paymentActive
+                                            : button.payment
+                                    }>
                                     <Image
                                         style={button.imageOvo}
                                         source={Payovo}
                                     />
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity>
-                                <View style={button.payment}>
+                            <TouchableOpacity
+                                onPress={() => this._handleClick('Paypal')}>
+                                <View
+                                    style={
+                                        this.state.selectedButton === 'Paypal'
+                                            ? button.paymentActive
+                                            : button.payment
+                                    }>
                                     <Image
                                         style={button.imagePaypal}
                                         source={Paypaypal}
                                     />
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity>
-                                <View style={button.payment}>
+                            <TouchableOpacity
+                                onPress={() => this._handleClick('Visa')}>
+                                <View
+                                    style={
+                                        this.state.selectedButton === 'Visa'
+                                            ? button.paymentActive
+                                            : button.payment
+                                    }>
                                     <Image
                                         style={button.imageVisa}
                                         source={Payvisa}
@@ -109,6 +163,9 @@ export class PaymentPage extends Component {
                             style={style.form}
                             keyboardType="email-address"
                             placeholder="Indra Budiman"
+                            onChangeText={(fullName) =>
+                                this.setState({fullName})
+                            }
                         />
 
                         <Text>Email</Text>
@@ -116,6 +173,7 @@ export class PaymentPage extends Component {
                             style={style.form}
                             keyboardType="email-address"
                             placeholder="budimanindra98@gmail.com"
+                            onChangeText={(email) => this.setState({email})}
                         />
 
                         <Text>Phone Number</Text>
@@ -123,6 +181,9 @@ export class PaymentPage extends Component {
                             style={style.form}
                             keyboardType="number-pad"
                             placeholder="0895383636947"
+                            onChangeText={(phoneNumber) =>
+                                this.setState({phoneNumber})
+                            }
                         />
 
                         <View style={style.warning}>
@@ -139,10 +200,7 @@ export class PaymentPage extends Component {
                     </View>
 
                     <View style={button.confirm}>
-                        <TouchableOpacity
-                            onPress={() =>
-                                this.props.navigation.navigate('TicketResults')
-                            }>
+                        <TouchableOpacity onPress={this.doPay}>
                             <View style={button.primary}>
                                 <Text style={button.text}>Pay your order</Text>
                             </View>
@@ -254,6 +312,17 @@ const button = StyleSheet.create({
         borderRadius: 4,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    paymentActive: {
+        width: 80,
+        height: 32,
+        margin: 16,
+        borderColor: '#DEDEDE',
+        borderWidth: 1,
+        borderRadius: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#e4e7df',
     },
     primary: {
         backgroundColor: '#5F2EEA',
