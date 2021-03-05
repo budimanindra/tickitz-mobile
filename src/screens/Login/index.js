@@ -35,7 +35,10 @@ class Login extends Component {
         return (
             <ScrollView>
                 <View style={style.container}>
-                    <Image source={Logo} />
+                    <TouchableOpacity
+                        onPress={() => this.props.navigation.navigate('Home')}>
+                        <Image source={Logo} />
+                    </TouchableOpacity>
                     <View>
                         <Text style={style.title}>Sign In</Text>
                     </View>

@@ -17,6 +17,7 @@ import AdminPage from '../AdminPage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Navbar from '../Navbar';
+import NavbarNonMember from '../NavbarNonMember';
 
 const Stack = createStackNavigator();
 
@@ -32,6 +33,24 @@ class Main extends Component {
                             name="SplashScreen"
                         />
                         <Stack.Screen
+                            component={Home}
+                            options={() => ({
+                                header: (props) => (
+                                    <NavbarNonMember {...props} />
+                                ),
+                            })}
+                            name="Home"
+                        />
+                        <Stack.Screen
+                            component={MovieDetails}
+                            options={() => ({
+                                header: (props) => (
+                                    <NavbarNonMember {...props} />
+                                ),
+                            })}
+                            name="MovieDetails"
+                        />
+                        <Stack.Screen
                             component={Login}
                             options={{headerShown: false}}
                             name="Login"
@@ -45,6 +64,24 @@ class Main extends Component {
                             component={ForgotPassword}
                             options={{headerShown: false}}
                             name="ForgotPassword"
+                        />
+                        <Stack.Screen
+                            component={OrderPage}
+                            options={() => ({
+                                header: (props) => (
+                                    <NavbarNonMember {...props} />
+                                ),
+                            })}
+                            name="OrderPage"
+                        />
+                        <Stack.Screen
+                            component={PaymentPage}
+                            options={() => ({
+                                header: (props) => (
+                                    <NavbarNonMember {...props} />
+                                ),
+                            })}
+                            name="PaymentPage"
                         />
                     </React.Fragment>
                 )}
