@@ -11,16 +11,49 @@ import {
 import Footer from '../../components/Footer';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
+import http from '../../helpers/http';
 
 export class OrderPage extends Component {
-    state = {};
-    constructRow = (numbers) => {
+    state = {seat: [], seatBought: [], seatPosition: [], time: ''};
+
+    updateSeat = (idSeat, position) => {
+        const index = this.state.seat.indexOf(position);
+        let newSeat = this.state.seat;
+        let newSeatPosition = this.state.seatPosition;
+        if (index === -1) {
+            newSeat.push(idSeat);
+            newSeatPosition.push(position);
+            this.setState({seat: newSeat, seatPosition: newSeatPosition});
+        } else {
+            newSeat.splice(index, 1);
+            newSeatPosition.splice(index, 1);
+            this.setState({seat: newSeat, seatPosition: newSeatPosition});
+        }
+    };
+
+    constructRow = (numbers, letter, counter) => {
         const row = [];
+        let id = counter;
         for (let i = 0; i < numbers.length; i++) {
+            const position = `${letter}${numbers[i]}`;
             if (numbers[i] === 8) {
-                row.push(<Gap />);
+                row.push(<Gap key={`Gap ${i}`} />);
             }
-            row.push(<AvailableSeat />);
+            if (this.state.seatBought.includes(position)) {
+                row.push(
+                    <SoldSeat key={position} position={position} idSeat={id} />,
+                );
+            } else {
+                row.push(
+                    <AvailableSeat
+                        key={position}
+                        updateSeat={this.updateSeat}
+                        position={position}
+                        idSeat={id}
+                    />,
+                );
+            }
+            id++;
         }
         return row;
     };
@@ -29,32 +62,71 @@ export class OrderPage extends Component {
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
         const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
         const seat = [];
+        let counter = 1;
         for (let i = 0; i < letters.length; i++) {
             seat.push(
-                <View style={style.row}>{this.constructRow(numbers)}</View>,
+                <View style={style.row} key={`Row ${i}`}>
+                    {this.constructRow(numbers, letters[i], counter)}
+                </View>,
             );
+            counter += 14;
         }
         return seat;
     };
 
+    buySeat = async () => {
+        console.log('MASUK');
+        const {cinemaId, showtimeId, date, price} = this.props.route.params;
+
+        const params = new URLSearchParams();
+        params.append('idCinema', cinemaId);
+        params.append('idShowtimes', showtimeId);
+        params.append('date', date);
+        // const results = await http().post('/tickets', params);
+        // console.log(results.data.success);
+
+        for (let i = 0; i < this.state.seat.length; i++) {
+            const idSeat = this.state.seat[i];
+            params.append('idSeats', idSeat);
+        }
+
+        await http().post('/tickets', params);
+
+        this.props.navigation.navigate('PaymentPage', {
+            totalPrice: price * this.state.seat.length,
+            date: date,
+            seatBought: this.state.seatPosition,
+            time: this.state.time,
+        });
+    };
+
+    async componentDidMount() {
+        const {cinemaId, showtimeId, date} = this.props.route.params;
+        const resultTickets = await http().get(
+            `/tickets?idCinema=${cinemaId}&idShowtimes=${showtimeId}&date=${date}`,
+        );
+        this.setState({
+            seatBought: resultTickets.data.results.map((seat) => seat.position),
+            time: resultTickets.data.results[0].showTimes,
+        });
+        console.log(this.state.seatBought);
+    }
+
     render() {
+        const {cinemaId, showtimeId, date} = this.props.route.params;
         return (
             <ScrollView>
                 <View style={style.container}>
                     <Text>Choose Your Seat</Text>
+                    <Text>CinemaID: {cinemaId}</Text>
+                    <Text>showtimeID: {showtimeId}</Text>
+                    <Text>date: {date}</Text>
+                    <Text>{this.state.seat}</Text>
 
                     <View style={style.seatingContainer}>
                         <View style={style.lineStyle1} />
 
                         <View>
-                            {/* {['A', 'B', 'C', 'D', 'E', 'F', 'G'].map((v, i) => (
-                                <View style={style.row}>
-                                    {[1, 2, 3, 4, 5, 6, 7].map((val, id) => (
-                                        <Seat />
-                                    ))}
-                                </View>
-                            ))} */}
-
                             <ScrollView
                                 horizontal={true}
                                 showsHorizontalScrollIndicator={true}>
@@ -103,10 +175,7 @@ export class OrderPage extends Component {
                         </View>
                     </View>
 
-                    <TouchableOpacity
-                        onPress={() =>
-                            this.props.navigation.navigate('PaymentPage')
-                        }>
+                    <TouchableOpacity onPress={this.buySeat}>
                         <View style={button.buttonPrimary}>
                             <Text style={button.textPrimary}>Checkout now</Text>
                         </View>
@@ -122,7 +191,13 @@ export class OrderPage extends Component {
 class AvailableSeat extends Component {
     render() {
         return (
-            <TouchableOpacity>
+            <TouchableOpacity
+                onPress={() =>
+                    this.props.updateSeat(
+                        this.props.idSeat,
+                        this.props.position,
+                    )
+                }>
                 <View style={button.seat} />
             </TouchableOpacity>
         );

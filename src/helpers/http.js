@@ -6,7 +6,7 @@ const http = (token = null) => {
         authorization: `Bearer ${token}`,
     };
     return axios.create({
-        baseURL: 'http://192.168.1.2:8080',
+        baseURL: 'http://192.168.1.6:8080',
         headers,
     });
 };

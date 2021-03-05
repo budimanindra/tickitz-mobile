@@ -27,15 +27,26 @@ export class PaymentPage extends Component {
         fullName: '',
         email: '',
         phoneNumber: '',
+        price: 0,
     };
+
+    componentDidMount() {
+        const {totalPrice} = this.props.route.params;
+        this.setState({price: totalPrice});
+    }
 
     _handleClick(button) {
         this.setState({selectedButton: button});
     }
 
     doPay = async () => {
-        const {fullName, email, phoneNumber} = this.state;
-        this.props.navigation.navigate('TicketResults');
+        const {date, seatBought, time} = this.props.route.params;
+        this.props.navigation.navigate('TicketResults', {
+            totalPrice: this.state.price,
+            date: date,
+            seatBought: seatBought,
+            time: time,
+        });
     };
 
     render() {
@@ -44,7 +55,7 @@ export class PaymentPage extends Component {
                 <View style={style.containerPayment}>
                     <View style={style.contentDirectionBetween}>
                         <Text style={style.textPayment}>Total Payment </Text>
-                        <Text style={style.price}>$30.00 </Text>
+                        <Text style={style.price}>Rp{this.state.price}</Text>
                     </View>
                 </View>
 

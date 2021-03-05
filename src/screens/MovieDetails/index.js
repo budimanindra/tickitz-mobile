@@ -8,6 +8,8 @@ import {
     Image,
 } from 'react-native';
 
+import DropDownPicker from 'react-native-dropdown-picker';
+
 import Footer from '../../components/Footer';
 import {connect} from 'react-redux';
 import {
@@ -22,6 +24,7 @@ import http from '../../helpers/http';
 export class MovieDetails extends Component {
     state = {
         selectedDate: null,
+        selectedDateString: '',
         selectedLocation: null,
         selectedShowtime: null,
         finish: false,
@@ -39,23 +42,24 @@ export class MovieDetails extends Component {
         return data;
     };
 
-    // generateListDate = (data) => {
-    //     let listDate = [];
-    //     let releaseDate = data.releaseDate;
-    //     let endDate = data.endDate;
-    //     let strDate = releaseDate;
-    //     let index = 1;
-    //     let dateMove = new Date(releaseDate);
+    generateListDate = (data) => {
+        let listDate = [];
+        const today = new Date();
+        const todayString = today.toISOString().split('T')[0];
+        let endDate = data.endDate;
+        let strDate = todayString;
+        let index = 1;
+        let dateMove = new Date(todayString);
 
-    //     while (strDate < endDate) {
-    //         strDate = dateMove.toISOString().slice(0, 10);
-    //         let dateObject = {id: index, readable: strDate};
-    //         listDate.push(dateObject);
-    //         dateMove.setDate(dateMove.getDate() + 1);
-    //         index++;
-    //     }
-    //     return listDate;
-    // };
+        while (strDate < endDate) {
+            strDate = dateMove.toISOString().slice(0, 10);
+            let dateObject = {id: index, readable: strDate};
+            listDate.push(dateObject);
+            dateMove.setDate(dateMove.getDate() + 1);
+            index++;
+        }
+        return listDate;
+    };
 
     async componentDidMount() {
         const {movieId} = this.props.route.params;
@@ -66,33 +70,33 @@ export class MovieDetails extends Component {
         );
         this.props.getMovie(dataMovie);
 
-        // const showDate = this.generateListDate(dataMovie);
-        // this.props.getShowDate(showDate);
+        const showDate = this.generateListDate(dataMovie);
+        this.props.getShowDate(showDate);
 
-        // const resultsCity = await http().get('/cities');
-        // this.props.getShowLocation(resultsCity.data.results);
+        const resultsCity = await http().get('/cities');
+        this.props.getShowLocation(resultsCity.data.results);
     }
 
     getCinemaByCondition = async (id, date, city) => {
-        // const resultsCinema = await http().get(
-        //     `/cinemas?id=${id}&date=${date}&city=${city}`,
-        // );
-        // this.props.getAvailCinema(resultsCinema.data.results);
+        const resultsCinema = await http().get(
+            `/cinemas?id=${id}&date=${date}&city=${city}`,
+        );
+        this.props.getAvailCinema(resultsCinema.data.results);
     };
 
     componentDidUpdate() {
-        // const {selectedDate, selectedLocation, finish} = this.state;
-        // if (selectedDate !== null && selectedLocation !== null && !finish) {
-        //     this.setState({finish: true}, () => {
-        //         this.getCinemaByCondition(
-        //             this.props.movie.details.id,
-        //             this.props.movie.showDate[Number(selectedDate) - 1]
-        //                 .readable,
-        //             this.props.movie.showLocation[Number(selectedLocation) - 1]
-        //                 .name,
-        //         );
-        //     });
-        // }
+        const {selectedDate, selectedLocation, finish} = this.state;
+        if (selectedDate !== null && selectedLocation !== null && !finish) {
+            this.setState({finish: true}, () => {
+                this.getCinemaByCondition(
+                    this.props.movie.details.id,
+                    this.props.movie.showDate[Number(selectedDate) - 1]
+                        .readable,
+                    this.props.movie.showLocation[Number(selectedLocation) - 1]
+                        .name,
+                );
+            });
+        }
     }
 
     render() {
@@ -168,47 +172,99 @@ export class MovieDetails extends Component {
 
                 <View style={style.container2} />
 
-                <View style={style.container3}>
-                    <View style={style.cardAlign}>
-                        <Image source={Sponsor1} />
-                        <Text style={text.cinemaAddress}>
-                            Whatever street No.12, South Purwokerto
-                        </Text>
-                    </View>
+                <DropDownPicker
+                    items={
+                        this.props.movie.showDate &&
+                        this.props.movie.showDate.map((date) => ({
+                            label: `${date.readable}`,
+                            value: `${date.id}`,
+                        }))
+                    }
+                    defaultValue={this.state.selectedDate}
+                    containerStyle={{height: 40}}
+                    onChangeItem={(item) =>
+                        this.setState({
+                            selectedDate: item.value,
+                            selectedDateString: this.props.movie.showDate[
+                                Number(item.value) - 1
+                            ].readable,
+                        })
+                    }
+                />
 
-                    <View style={style.lineStyle2} />
-                    <View style={style.movieTime}>
-                        <Text style={text.movieTime}>08.30am</Text>
-                        <Text style={text.movieTime}>08.30am</Text>
-                        <Text style={text.movieTime}>08.30am</Text>
-                        <Text style={text.movieTime}>08.30am</Text>
-                    </View>
-                    <View style={style.movieTime}>
-                        <Text style={text.movieTime}>08.30am</Text>
-                        <Text style={text.movieTime}>08.30am</Text>
-                        <Text style={text.movieTime}>08.30am</Text>
-                        <Text style={text.movieTime}>08.30am</Text>
-                    </View>
+                <DropDownPicker
+                    items={
+                        this.props.movie.showLocation &&
+                        this.props.movie.showLocation.map((city) => ({
+                            label: `${city.name}`,
+                            value: `${city.id}`,
+                        }))
+                    }
+                    defaultValue={this.state.selectedLocation}
+                    containerStyle={{height: 40}}
+                    onChangeItem={(item) =>
+                        this.setState({
+                            selectedLocation: item.value,
+                        })
+                    }
+                />
 
-                    <View style={style.moviePricePerSeat}>
-                        <Text style={text.moviePrice}>Price</Text>
-                        <Text style={text.moviePerSeat}>$10.00/seat</Text>
-                    </View>
+                {this.props.movie.availCinema.map((cinema) => (
+                    <View style={style.container3}>
+                        <View style={style.cardAlign}>
+                            <Image source={cinema.image} />
+                            <Text style={text.cinemaAddress}>
+                                {cinema.address}
+                            </Text>
+                        </View>
 
-                    <View style={style.movieButton}>
-                        <TouchableOpacity
-                            onPress={() =>
-                                this.props.navigation.navigate('OrderPage')
-                            }>
-                            <View style={button.primary}>
-                                <Text style={button.text}>Book now</Text>
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity>
-                            <Text style={text.clickableText}> Reset now</Text>
-                        </TouchableOpacity>
+                        <View style={style.lineStyle2} />
+                        <View style={style.movieTime}>
+                            <Text style={text.movieTime}>08.30am</Text>
+                            <Text style={text.movieTime}>08.30am</Text>
+                            <Text style={text.movieTime}>08.30am</Text>
+                            <Text style={text.movieTime}>08.30am</Text>
+                        </View>
+                        <View style={style.movieTime}>
+                            <Text style={text.movieTime}>08.30am</Text>
+                            <Text style={text.movieTime}>08.30am</Text>
+                            <Text style={text.movieTime}>08.30am</Text>
+                            <Text style={text.movieTime}>08.30am</Text>
+                        </View>
+
+                        <View style={style.moviePricePerSeat}>
+                            <Text style={text.moviePrice}>Price</Text>
+                            <Text style={text.moviePerSeat}>
+                                Rp{cinema.priceWeekend}/seat
+                            </Text>
+                        </View>
+
+                        <View style={style.movieButton}>
+                            <TouchableOpacity
+                                onPress={() =>
+                                    this.props.navigation.navigate(
+                                        'OrderPage',
+                                        {
+                                            cinemaId: cinema.id,
+                                            showtimeId: cinema.idShowtime,
+                                            date: this.state.selectedDateString,
+                                            price: cinema.priceWeekend,
+                                        },
+                                    )
+                                }>
+                                <View style={button.primary}>
+                                    <Text style={button.text}>Book now</Text>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity>
+                                <Text style={text.clickableText}>
+                                    {' '}
+                                    Reset now
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </View>
+                ))}
                 <Footer />
             </ScrollView>
         );

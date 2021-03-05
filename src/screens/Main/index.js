@@ -14,7 +14,7 @@ import OrderPage from '../OrderPage';
 import PaymentPage from '../PaymentPage';
 import TicketResults from '../TicketResults';
 import AdminPage from '../AdminPage';
-import Dropdown from '../Dropdown';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Navbar from '../Navbar';
 
@@ -59,18 +59,11 @@ class Main extends Component {
                             name="Home"
                         />
                         <Stack.Screen
-                            component={AdminPage}
+                            component={MovieDetails}
                             options={() => ({
                                 header: (props) => <Navbar {...props} />,
                             })}
-                            name="AdminPage"
-                        />
-                        <Stack.Screen
-                            component={Profile}
-                            options={() => ({
-                                header: (props) => <Navbar {...props} />,
-                            })}
-                            name="Profile"
+                            name="MovieDetails"
                         />
                         <Stack.Screen
                             component={OrderPage}
@@ -94,11 +87,18 @@ class Main extends Component {
                             name="TicketResults"
                         />
                         <Stack.Screen
-                            component={MovieDetails}
+                            component={AdminPage}
                             options={() => ({
                                 header: (props) => <Navbar {...props} />,
                             })}
-                            name="MovieDetails"
+                            name="AdminPage"
+                        />
+                        <Stack.Screen
+                            component={Profile}
+                            options={() => ({
+                                header: (props) => <Navbar {...props} />,
+                            })}
+                            name="Profile"
                         />
                     </React.Fragment>
                 )}

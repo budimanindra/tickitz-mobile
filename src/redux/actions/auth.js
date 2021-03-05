@@ -1,4 +1,5 @@
 import http from '../../helpers/http';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const resetError = () => {
     return async (dispatch) => {
@@ -20,6 +21,7 @@ export const login = (username, password) => {
                 payload: null,
             });
             const results = await http().post('/auth/login', params);
+            AsyncStorage.setItem('token', results.data.token);
             dispatch({
                 type: 'LOGIN',
                 payload: results.data.token,
@@ -61,6 +63,7 @@ export const register = (username, password) => {
 
 export const logout = () => {
     return async (dispatch) => {
+        AsyncStorage.removeItem('token');
         try {
             dispatch({
                 type: 'LOGOUT',
