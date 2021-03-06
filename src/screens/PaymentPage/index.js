@@ -7,11 +7,16 @@ import {
     Image,
     ScrollView,
     TextInput,
-    TouchableHighlight,
+    Alert,
+    Modal,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import Footer from '../../components/Footer';
+
+import {connect} from 'react-redux';
+
+import {doTransaction} from '../../redux/actions/transaction';
 
 import Paydana from '../../assets/paydana.png';
 import Paygopay from '../../assets/paygopay.png';
@@ -27,41 +32,77 @@ export class PaymentPage extends Component {
         fullName: '',
         email: '',
         phoneNumber: '',
-        price: 0,
+        modalVisible: false,
     };
-
-    componentDidMount() {
-        const {totalPrice} = this.props.route.params;
-        this.setState({price: totalPrice});
-    }
 
     _handleClick(button) {
         this.setState({selectedButton: button});
     }
 
-    doPay = async () => {
-        const {date, seatBought, time} = this.props.route.params;
-        this.props.navigation.navigate('TicketResults', {
-            totalPrice: this.state.price,
-            date: date,
-            seatBought: seatBought,
-            time: time,
-        });
+    setModalVisible = (visible) => {
+        this.setState({modalVisible: visible});
     };
 
+    doPay = async () => {
+        if (this.props.auth.token === null) {
+            this.setModalVisible(true);
+        } else {
+            this.props.doTransaction(this.props.transaction.transactionDetails);
+            this.props.navigation.navigate('TicketResults');
+        }
+    };
+
+    // setModalVisible = (visible) => {
+    //     this.setState({modalVisible: visible});
+    // };
+
     render() {
+        const {modalVisible} = this.state;
         return (
             <ScrollView>
+                <View style={style.centeredModal}>
+                    <Modal
+                        animationType="fade"
+                        transparent={true}
+                        visible={modalVisible}
+                        onRequestClose={() => {
+                            this.setModalVisible(!modalVisible);
+                        }}>
+                        <View style={style.centeredModal}>
+                            <View style={style.modalView}>
+                                <Text style={style.modalText}>
+                                    You have to login first to finish the
+                                    transaction
+                                </Text>
+                                <TouchableOpacity
+                                    style={[style.button, style.buttonClose]}
+                                    onPress={() =>
+                                        this.props.navigation.navigate('Login')
+                                    }>
+                                    <Text style={style.textStyle}>
+                                        Go to Login Page
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Modal>
+                </View>
+
                 <View style={style.containerPayment}>
                     <View style={style.contentDirectionBetween}>
                         <Text style={style.textPayment}>Total Payment </Text>
-                        <Text style={style.price}>Rp{this.state.price}</Text>
+                        <Text style={style.price}>
+                            Rp
+                            {
+                                this.props.transaction.transactionDetails
+                                    .totalPrice
+                            }
+                        </Text>
                     </View>
                 </View>
 
                 <View style={style.container}>
                     <Text style={style.title}>Payment Method</Text>
-
                     <View style={style.sectionCard}>
                         <View style={style.contentDirection}>
                             <TouchableOpacity
@@ -204,7 +245,6 @@ export class PaymentPage extends Component {
                                 size={25}
                             />
                             <Text style={style.warningText}>
-                                {' '}
                                 Fill your data correctly.
                             </Text>
                         </View>
@@ -223,8 +263,6 @@ export class PaymentPage extends Component {
         );
     }
 }
-
-export default PaymentPage;
 
 const style = StyleSheet.create({
     container: {
@@ -311,6 +349,45 @@ const style = StyleSheet.create({
         letterSpacing: 1,
         color: '#4E4B66',
     },
+    centeredModal: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: '#5F2EEA',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    button: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2,
+    },
+    buttonClose: {
+        backgroundColor: 'white',
+    },
+    textStyle: {
+        color: '#5F2EEA',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: 'center',
+        color: 'white',
+        fontWeight: 'bold',
+    },
 });
 
 const button = StyleSheet.create({
@@ -373,3 +450,12 @@ const button = StyleSheet.create({
         marginTop: 56,
     },
 });
+
+const mapStateToProps = (state) => ({
+    transaction: state.transaction,
+    auth: state.auth,
+});
+
+const mapDispatchToProps = {doTransaction};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PaymentPage);

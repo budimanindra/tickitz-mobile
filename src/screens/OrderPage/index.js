@@ -5,21 +5,34 @@ import {
     ScrollView,
     StyleSheet,
     TouchableOpacity,
-    Image,
 } from 'react-native';
 
 import Footer from '../../components/Footer';
+
+import {connect} from 'react-redux';
+
+import {transactionData} from '../../redux/actions/transaction';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 import http from '../../helpers/http';
 
 export class OrderPage extends Component {
-    state = {seat: [], seatBought: [], seatPosition: [], time: ''};
+    state = {
+        seat: [],
+        seatBought: [],
+        seatPosition: [],
+        time: '',
+        cinemaId: '',
+        showtimeId: '',
+        date: '',
+        totalPrice: '',
+    };
 
     updateSeat = (idSeat, position) => {
-        const index = this.state.seat.indexOf(position);
+        const index = this.state.seat.indexOf(idSeat);
         let newSeat = this.state.seat;
         let newSeatPosition = this.state.seatPosition;
+
         if (index === -1) {
             newSeat.push(idSeat);
             newSeatPosition.push(position);
@@ -75,29 +88,24 @@ export class OrderPage extends Component {
     };
 
     buySeat = async () => {
-        console.log('MASUK');
         const {cinemaId, showtimeId, date, price} = this.props.route.params;
+        const seatPosition = this.state.seatPosition;
+        const time = this.state.time;
+        const totalPrice = price * this.state.seat.length;
 
-        const params = new URLSearchParams();
-        params.append('idCinema', cinemaId);
-        params.append('idShowtimes', showtimeId);
-        params.append('date', date);
-        // const results = await http().post('/tickets', params);
-        // console.log(results.data.success);
+        const {seat} = this.state;
 
-        for (let i = 0; i < this.state.seat.length; i++) {
-            const idSeat = this.state.seat[i];
-            params.append('idSeats', idSeat);
-        }
-
-        await http().post('/tickets', params);
-
-        this.props.navigation.navigate('PaymentPage', {
-            totalPrice: price * this.state.seat.length,
-            date: date,
-            seatBought: this.state.seatPosition,
-            time: this.state.time,
+        await this.props.transactionData({
+            cinemaId,
+            showtimeId,
+            date,
+            seat,
+            totalPrice,
+            seatPosition,
+            time,
         });
+
+        this.props.navigation.navigate('PaymentPage');
     };
 
     async componentDidMount() {
@@ -203,6 +211,22 @@ class AvailableSeat extends Component {
         );
     }
 }
+
+// class SelectedSeat extends Component {
+//     render() {
+//         return (
+//             <TouchableOpacity
+//                 onPress={() =>
+//                     this.props.updateSeat(
+//                         this.props.idSeat,
+//                         this.props.position,
+//                     )
+//                 }>
+//                 {/* <View style={button.SelectedSeat} /> */}
+//             </TouchableOpacity>
+//         );
+//     }
+// }
 
 class SoldSeat extends Component {
     render() {
@@ -327,4 +351,6 @@ const button = StyleSheet.create({
     },
 });
 
-export default OrderPage;
+const mapDispatchToProps = {transactionData};
+
+export default connect(null, mapDispatchToProps)(OrderPage);

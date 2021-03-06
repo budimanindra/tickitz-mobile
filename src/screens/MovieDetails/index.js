@@ -18,7 +18,6 @@ import {
     getShowLocation,
     getAvailCinema,
 } from '../../redux/actions/movie';
-import Sponsor1 from '../../assets/sponsor1.png';
 import http from '../../helpers/http';
 
 export class MovieDetails extends Component {
@@ -258,7 +257,6 @@ export class MovieDetails extends Component {
                             </TouchableOpacity>
                             <TouchableOpacity>
                                 <Text style={text.clickableText}>
-                                    {' '}
                                     Reset now
                                 </Text>
                             </TouchableOpacity>

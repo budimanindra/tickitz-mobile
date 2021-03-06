@@ -1,13 +1,5 @@
 import React, {Component} from 'react';
-import {
-    Text,
-    View,
-    TouchableOpacity,
-    StyleSheet,
-    Image,
-    ScrollView,
-    TextInput,
-} from 'react-native';
+import {Text, View, StyleSheet, Image, ScrollView} from 'react-native';
 
 import http from '../../helpers/http';
 
@@ -15,24 +7,10 @@ import {connect} from 'react-redux';
 
 import Footer from '../../components/Footer';
 
-import Icon from 'react-native-vector-icons/FontAwesome';
-
 import Success from '../../assets/success.png';
 import Barcode from '../../assets/barcode.png';
 
 export class TicketResults extends Component {
-    state = {seatBought: [], price: 0, date: '', time: ''};
-
-    async componentDidMount() {
-        const {date, totalPrice, seatBought, time} = this.props.route.params;
-        this.setState({
-            seatBought: seatBought,
-            price: totalPrice,
-            date: date,
-            time: time,
-        });
-    }
-
     render() {
         return (
             <ScrollView>
@@ -76,7 +54,10 @@ export class TicketResults extends Component {
                                     Date
                                 </Text>
                                 <Text style={text.MovieSpecificationValue}>
-                                    {this.state.date}
+                                    {
+                                        this.props.transaction
+                                            .transactionDetails.date
+                                    }
                                 </Text>
                             </View>
                             <View style={text.MovieSpecificationFlex}>
@@ -84,7 +65,10 @@ export class TicketResults extends Component {
                                     Time
                                 </Text>
                                 <Text style={text.MovieSpecificationValue}>
-                                    {this.state.time}
+                                    {
+                                        this.props.transaction
+                                            .transactionDetails.time
+                                    }
                                 </Text>
                             </View>
                         </View>
@@ -95,7 +79,11 @@ export class TicketResults extends Component {
                                     Count
                                 </Text>
                                 <Text style={text.MovieSpecificationValue}>
-                                    {this.state.seatBought.length} pcs
+                                    {
+                                        this.props.transaction
+                                            .transactionDetails.seat.length
+                                    }{' '}
+                                    pcs
                                 </Text>
                             </View>
                             <View style={text.MovieSpecificationFlex}>
@@ -103,14 +91,22 @@ export class TicketResults extends Component {
                                     Seats
                                 </Text>
                                 <Text style={text.MovieSpecificationValue}>
-                                    {this.state.seatBought.join(', ')}
+                                    {this.props.transaction.transactionDetails.seatPosition.join(
+                                        ', ',
+                                    )}
                                 </Text>
                             </View>
                         </View>
 
                         <View style={style.totalPayment}>
                             <Text>Total</Text>
-                            <Text>Rp{this.state.price}</Text>
+                            <Text>
+                                Rp
+                                {
+                                    this.props.transaction.transactionDetails
+                                        .totalPrice
+                                }
+                            </Text>
                         </View>
                     </View>
                 </View>
@@ -119,12 +115,6 @@ export class TicketResults extends Component {
         );
     }
 }
-
-const mapStateToProps = (state) => ({
-    movie: state.movie,
-});
-
-export default connect(mapStateToProps)(TicketResults);
 
 const style = StyleSheet.create({
     container: {
@@ -195,3 +185,10 @@ const text = StyleSheet.create({
         color: '#14142B',
     },
 });
+
+const mapStateToProps = (state) => ({
+    transaction: state.transaction,
+    movie: state.movie,
+});
+
+export default connect(mapStateToProps)(TicketResults);
