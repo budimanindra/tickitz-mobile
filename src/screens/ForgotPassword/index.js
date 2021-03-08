@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {
     View,
     Text,
@@ -8,12 +8,15 @@ import {
     TouchableOpacity,
 } from 'react-native';
 
-import logo from '../../assets/V1-Signup.png';
+import Logo from '../../assets/V1-Signup.png';
 
 const ForgotPassword = () => {
     return (
         <View style={style.container}>
-            <Image source={logo} />
+            <TouchableOpacity
+                onPress={() => this.props.navigation.navigate('Home')}>
+                <Image source={Logo} />
+            </TouchableOpacity>
             <View>
                 <Text style={style.title}>Forgot Password</Text>
                 <Text style={style.text}>

@@ -21,7 +21,6 @@ export class OrderPage extends Component {
         seat: [],
         seatBought: [],
         seatPosition: [],
-        time: '',
         cinemaId: '',
         showtimeId: '',
         date: '',
@@ -88,9 +87,14 @@ export class OrderPage extends Component {
     };
 
     buySeat = async () => {
-        const {cinemaId, showtimeId, date, price} = this.props.route.params;
+        const {
+            cinemaId,
+            showtimeId,
+            date,
+            price,
+            time,
+        } = this.props.route.params;
         const seatPosition = this.state.seatPosition;
-        const time = this.state.time;
         const totalPrice = price * this.state.seat.length;
 
         const {seat} = this.state;
@@ -115,7 +119,6 @@ export class OrderPage extends Component {
         );
         this.setState({
             seatBought: resultTickets.data.results.map((seat) => seat.position),
-            time: resultTickets.data.results[0].showTimes,
         });
         console.log(this.state.seatBought);
     }
@@ -126,10 +129,10 @@ export class OrderPage extends Component {
             <ScrollView>
                 <View style={style.container}>
                     <Text>Choose Your Seat</Text>
-                    <Text>CinemaID: {cinemaId}</Text>
+                    {/* <Text>CinemaID: {cinemaId}</Text>
                     <Text>showtimeID: {showtimeId}</Text>
                     <Text>date: {date}</Text>
-                    <Text>{this.state.seat}</Text>
+                    <Text>{this.state.seat}</Text> */}
 
                     <View style={style.seatingContainer}>
                         <View style={style.lineStyle1} />
@@ -197,36 +200,41 @@ export class OrderPage extends Component {
 }
 
 class AvailableSeat extends Component {
+    state = {
+        selectedSeat: false,
+    };
+
+    changeStyle() {
+        this.setState({
+            selectedSeat: !this.state.selectedSeat,
+        });
+        this.props.updateSeat(this.props.idSeat, this.props.position);
+    }
+
     render() {
         return (
-            <TouchableOpacity
-                onPress={() =>
-                    this.props.updateSeat(
-                        this.props.idSeat,
-                        this.props.position,
-                    )
-                }>
-                <View style={button.seat} />
+            <TouchableOpacity onPress={() => this.changeStyle()}>
+                <View
+                    style={
+                        this.state.selectedSeat
+                            ? button.seatSelected
+                            : button.seat
+                    }
+                />
             </TouchableOpacity>
         );
     }
 }
 
-// class SelectedSeat extends Component {
-//     render() {
-//         return (
-//             <TouchableOpacity
-//                 onPress={() =>
-//                     this.props.updateSeat(
-//                         this.props.idSeat,
-//                         this.props.position,
-//                     )
-//                 }>
-//                 {/* <View style={button.SelectedSeat} /> */}
-//             </TouchableOpacity>
-//         );
-//     }
-// }
+class SelectedSeat extends Component {
+    render() {
+        return (
+            <TouchableOpacity>
+                <View style={button.SelectedSeat} />
+            </TouchableOpacity>
+        );
+    }
+}
 
 class SoldSeat extends Component {
     render() {

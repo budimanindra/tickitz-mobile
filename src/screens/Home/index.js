@@ -7,6 +7,7 @@ import {
     StyleSheet,
     TouchableOpacity,
     ScrollView,
+    Button,
 } from 'react-native';
 
 import http from '../../helpers/http';
@@ -117,26 +118,36 @@ class Home extends Component {
                             horizontal={true}
                             showsHorizontalScrollIndicator={false}>
                             {this.state.showing.map((movie) => (
-                                <TouchableOpacity
-                                    key={`Now Showing Movie: ${movie.id}`}
-                                    onPress={() =>
-                                        this.props.navigation.navigate(
-                                            'MovieDetails',
-                                            {
-                                                movieId: movie.id,
-                                            },
-                                        )
-                                    }
-                                    style={button.card}>
-                                    <View>
-                                        <Image
-                                            source={{
-                                                uri: movie.image,
-                                            }}
-                                            style={button.moviePoster}
-                                        />
-                                    </View>
-                                </TouchableOpacity>
+                                <View style={button.card}>
+                                    <Image
+                                        source={{
+                                            uri: movie.image,
+                                        }}
+                                        style={button.moviePoster}
+                                    />
+                                    <Text style={style.movieTitle}>
+                                        {movie.name}
+                                    </Text>
+                                    <Text style={style.movieGenre}>
+                                        {movie.genreName}
+                                    </Text>
+                                    <TouchableOpacity
+                                        key={`Now Showing Movie: ${movie.id}`}
+                                        onPress={() =>
+                                            this.props.navigation.navigate(
+                                                'MovieDetails',
+                                                {
+                                                    movieId: movie.id,
+                                                },
+                                            )
+                                        }>
+                                        <View style={button.secondary}>
+                                            <Text style={button.textSecondary}>
+                                                Details
+                                            </Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                </View>
                             ))}
                         </ScrollView>
                     </View>
@@ -157,50 +168,36 @@ class Home extends Component {
                             horizontal={true}
                             showsHorizontalScrollIndicator={false}>
                             {this.state.upcoming.map((movie) => (
-                                <TouchableOpacity
-                                    key={`Upcoming Movie: ${movie.id}`}
-                                    onPress={() =>
-                                        this.props.navigation.navigate(
-                                            'MovieDetails',
-                                            {
-                                                movieId: movie.id,
-                                            },
-                                        )
-                                    }
-                                    style={button.card}>
-                                    <View>
-                                        <Image
-                                            source={{
-                                                uri: movie.image,
-                                            }}
-                                            style={button.moviePoster}
-                                        />
-                                        <Text style={style.movieTitle}>
-                                            {movie.name}
-                                        </Text>
-                                        <Text style={style.movieGenre}>
-                                            {movie.genreName}
-                                        </Text>
-                                        <TouchableOpacity
-                                            onPress={() =>
-                                                this.props.navigation.navigate(
-                                                    'MovieDetails',
-                                                    {
-                                                        movieId: movie.id,
-                                                    },
-                                                )
-                                            }>
-                                            <View style={button.secondary}>
-                                                <Text
-                                                    style={
-                                                        button.textSecondary
-                                                    }>
-                                                    Details
-                                                </Text>
-                                            </View>
-                                        </TouchableOpacity>
-                                    </View>
-                                </TouchableOpacity>
+                                <View style={button.card}>
+                                    <Image
+                                        source={{
+                                            uri: movie.image,
+                                        }}
+                                        style={button.moviePoster}
+                                    />
+                                    <Text style={style.movieTitle}>
+                                        {movie.name}
+                                    </Text>
+                                    <Text style={style.movieGenre}>
+                                        {movie.genreName}
+                                    </Text>
+                                    <TouchableOpacity
+                                        key={`Now Showing Movie: ${movie.id}`}
+                                        onPress={() =>
+                                            this.props.navigation.navigate(
+                                                'MovieDetails',
+                                                {
+                                                    movieId: movie.id,
+                                                },
+                                            )
+                                        }>
+                                        <View style={button.secondary}>
+                                            <Text style={button.textSecondary}>
+                                                Details
+                                            </Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                </View>
                             ))}
                         </ScrollView>
                     </View>
@@ -363,6 +360,7 @@ const button = StyleSheet.create({
         borderWidth: 1,
         padding: 16,
         marginRight: 16,
+        width: 155,
     },
     moviePoster: {
         width: 122,

@@ -25,9 +25,19 @@ export class MovieDetails extends Component {
         selectedDate: null,
         selectedDateString: '',
         selectedLocation: null,
-        selectedShowtime: null,
+        selectedIdShowtime: '',
+        selectedShowtime: '',
+        styleChecker: '',
         finish: false,
     };
+
+    _handleClick(idShowtime, showtime, index) {
+        this.setState({
+            selectedShowtime: showtime,
+            selectedIdShowtime: idShowtime,
+            styleChecker: `${index} - ${idShowtime}`,
+        });
+    }
 
     movieDetailFormat = (data) => {
         const releaseDatetime = data.releaseDate.split('T');
@@ -96,6 +106,60 @@ export class MovieDetails extends Component {
                 );
             });
         }
+    }
+
+    showTimeTop(cinema, cinemaIndex) {
+        const row = [];
+        for (let index = 0; index < 4; index++) {
+            row.push(
+                <TouchableOpacity
+                    onPress={() =>
+                        this._handleClick(
+                            cinema.idShowtime[index],
+                            cinema.showTimes[index],
+                            cinemaIndex,
+                        )
+                    }>
+                    <Text
+                        style={
+                            this.state.styleChecker ===
+                            `${cinemaIndex} - ${cinema.idShowtime[index]}`
+                                ? text.movieTimeSelected
+                                : text.movieTime
+                        }>
+                        {cinema.showTimes[index]}
+                    </Text>
+                </TouchableOpacity>,
+            );
+        }
+        return row;
+    }
+
+    showTimeBottom(cinema, cinemaIndex) {
+        const row = [];
+        for (let index = 4; index < 8; index++) {
+            row.push(
+                <TouchableOpacity
+                    onPress={() =>
+                        this._handleClick(
+                            cinema.idShowtime[index],
+                            cinema.showTimes[index],
+                            cinemaIndex,
+                        )
+                    }>
+                    <Text
+                        style={
+                            this.state.styleChecker ===
+                            `${cinemaIndex} - ${cinema.idShowtime[index]}`
+                                ? text.movieTimeSelected
+                                : text.movieTime
+                        }>
+                        {cinema.showTimes[index]}
+                    </Text>
+                </TouchableOpacity>,
+            );
+        }
+        return row;
     }
 
     render() {
@@ -171,44 +235,56 @@ export class MovieDetails extends Component {
 
                 <View style={style.container2} />
 
-                <DropDownPicker
-                    items={
-                        this.props.movie.showDate &&
-                        this.props.movie.showDate.map((date) => ({
-                            label: `${date.readable}`,
-                            value: `${date.id}`,
-                        }))
-                    }
-                    defaultValue={this.state.selectedDate}
-                    containerStyle={{height: 40}}
-                    onChangeItem={(item) =>
-                        this.setState({
-                            selectedDate: item.value,
-                            selectedDateString: this.props.movie.showDate[
-                                Number(item.value) - 1
-                            ].readable,
-                        })
-                    }
-                />
+                <View style={style.movieTime}>
+                    <DropDownPicker
+                        items={
+                            this.props.movie.showDate &&
+                            this.props.movie.showDate.map((date) => ({
+                                label: `${date.readable}`,
+                                value: `${date.id}`,
+                            }))
+                        }
+                        defaultValue={this.state.selectedDate}
+                        containerStyle={{
+                            width: 150,
+                            // height: 50,
+                            marginLeft: 24,
+                            // marginRight: 12,
+                        }}
+                        onChangeItem={(item) =>
+                            this.setState({
+                                selectedDate: item.value,
+                                selectedDateString: this.props.movie.showDate[
+                                    Number(item.value) - 1
+                                ].readable,
+                            })
+                        }
+                    />
 
-                <DropDownPicker
-                    items={
-                        this.props.movie.showLocation &&
-                        this.props.movie.showLocation.map((city) => ({
-                            label: `${city.name}`,
-                            value: `${city.id}`,
-                        }))
-                    }
-                    defaultValue={this.state.selectedLocation}
-                    containerStyle={{height: 40}}
-                    onChangeItem={(item) =>
-                        this.setState({
-                            selectedLocation: item.value,
-                        })
-                    }
-                />
+                    <DropDownPicker
+                        items={
+                            this.props.movie.showLocation &&
+                            this.props.movie.showLocation.map((city) => ({
+                                label: `${city.name}`,
+                                value: `${city.id}`,
+                            }))
+                        }
+                        defaultValue={this.state.selectedLocation}
+                        containerStyle={{
+                            width: 150,
+                            // height: 50,
+                            // marginLeft: 12,
+                            marginRight: 24,
+                        }}
+                        onChangeItem={(item) =>
+                            this.setState({
+                                selectedLocation: item.value,
+                            })
+                        }
+                    />
+                </View>
 
-                {this.props.movie.availCinema.map((cinema) => (
+                {this.props.movie.availCinema.map((cinema, index) => (
                     <View style={style.container3}>
                         <View style={style.cardAlign}>
                             <Image source={cinema.image} />
@@ -219,16 +295,10 @@ export class MovieDetails extends Component {
 
                         <View style={style.lineStyle2} />
                         <View style={style.movieTime}>
-                            <Text style={text.movieTime}>08.30am</Text>
-                            <Text style={text.movieTime}>08.30am</Text>
-                            <Text style={text.movieTime}>08.30am</Text>
-                            <Text style={text.movieTime}>08.30am</Text>
+                            {this.showTimeTop(cinema, index)}
                         </View>
                         <View style={style.movieTime}>
-                            <Text style={text.movieTime}>08.30am</Text>
-                            <Text style={text.movieTime}>08.30am</Text>
-                            <Text style={text.movieTime}>08.30am</Text>
-                            <Text style={text.movieTime}>08.30am</Text>
+                            {this.showTimeBottom(cinema, index)}
                         </View>
 
                         <View style={style.moviePricePerSeat}>
@@ -245,7 +315,9 @@ export class MovieDetails extends Component {
                                         'OrderPage',
                                         {
                                             cinemaId: cinema.id,
-                                            showtimeId: cinema.idShowtime,
+                                            showtimeId: this.state
+                                                .selectedIdShowtime,
+                                            time: this.state.selectedShowtime,
                                             date: this.state.selectedDateString,
                                             price: cinema.priceWeekend,
                                         },
@@ -282,6 +354,7 @@ const style = StyleSheet.create({
         paddingBottom: 64,
     },
     container3: {
+        marginVertical: 35,
         padding: 32,
         marginHorizontal: 24,
         backgroundColor: '#FFFFFF',
@@ -390,6 +463,13 @@ const text = StyleSheet.create({
         fontWeight: '400',
         lineHeight: 23,
         color: '#4E4B66',
+    },
+    movieTimeSelected: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        lineHeight: 23,
+        color: '#4E4B66',
+        backgroundColor: '#DADADA',
     },
     moviePrice: {
         fontSize: 14,

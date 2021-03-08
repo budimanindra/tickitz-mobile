@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import {notification} from '../../components/Notification';
+
 import Footer from '../../components/Footer';
 
 import {connect} from 'react-redux';
@@ -48,6 +50,13 @@ export class PaymentPage extends Component {
             this.setModalVisible(true);
         } else {
             this.props.doTransaction(this.props.transaction.transactionDetails);
+            notification.configure();
+            notification.makeChannel('1');
+            notification.sendNotification(
+                '1',
+                'Ticket Purchased',
+                'Yay, Have a great time !',
+            );
             this.props.navigation.navigate('TicketResults');
         }
     };

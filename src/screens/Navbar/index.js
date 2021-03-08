@@ -6,6 +6,7 @@ import {
     StyleSheet,
     Image,
     TextInput,
+    Alert,
 } from 'react-native';
 import Collapsible from 'react-native-collapsible';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -27,6 +28,8 @@ class Navbar extends Component {
 
     doLogout = async () => {
         await this.props.logout();
+        this.props.navigation.replace('Login');
+        Alert.alert('logged out');
     };
 
     render() {
