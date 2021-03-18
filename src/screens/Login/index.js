@@ -17,6 +17,8 @@ import Logo from '../../assets/V1-Signup.png';
 import GoogleIcon from '../../assets/icon-google.png';
 import FbIcon from '../../assets/icon-facebook.png';
 
+import {showMessage} from 'react-native-flash-message';
+
 import {login} from '../../redux/actions/auth';
 
 class Login extends Component {
@@ -29,6 +31,19 @@ class Login extends Component {
     doLogin = async () => {
         const {email, password} = this.state;
         await this.props.login(email, password);
+        if (this.props.auth.token !== null) {
+            showMessage({
+                message: 'Success',
+                description: 'Succesfully logged in',
+                type: 'success',
+            });
+        } else {
+            showMessage({
+                message: 'Failed',
+                description: 'Wrong email or password',
+                type: 'danger',
+            });
+        }
     };
 
     render() {
@@ -70,10 +85,6 @@ class Login extends Component {
                             <Icon name="eye" size={25} />
                         </TouchableOpacity>
                     </View>
-
-                    <Text style={style.alertText}>
-                        {this.props.auth.errorMsg}
-                    </Text>
 
                     <TouchableOpacity onPress={this.doLogin}>
                         <View style={button.primary}>

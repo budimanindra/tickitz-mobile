@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {
     Text,
     View,
@@ -7,9 +7,21 @@ import {
     Image,
     ScrollView,
     TextInput,
+    Modal,
+    ActivityIndicator,
 } from 'react-native';
 
+import {REACT_APP_API_URL} from '@env';
+
 import Icon from 'react-native-vector-icons/FontAwesome';
+
+import http from '../../helpers/http';
+
+import {showMessage} from 'react-native-flash-message';
+
+import {connect} from 'react-redux';
+
+import {updateProfileDetails, getUser} from '../../redux/actions/auth';
 
 import Footer from '../../components/Footer';
 
@@ -18,143 +30,383 @@ import star from '../../assets/star.png';
 import ebv from '../../assets/sponsor1.png';
 import cineone from '../../assets/sponsor2.png';
 
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 
-const DetailsAccount = () => {
-    return (
-        <ScrollView>
-            <View style={style.container}>
-                <View style={style.rowSpaceBetween}>
-                    <Text>INFO</Text>
-                    <TouchableOpacity>
-                        <Icon name="ellipsis-h" color="#5F2EEA" size={25} />
+class DetailsAccount extends Component {
+    state = {
+        visible: true,
+        modalVisible: false,
+        photo: null,
+        email: '',
+        password: '',
+        fullName: '',
+        phoneNumber: '',
+        repassword: '',
+    };
+
+    setModalVisible = (visible) => {
+        this.setState({modalVisible: visible});
+    };
+
+    openGallery = () => {
+        const options = {mediaType: 'photo'};
+        launchImageLibrary(options, (response) => {
+            if (response.didCancel) {
+            } else if (response.fileSize > 1 * 1024 * 1024) {
+                showMessage({
+                    message: 'Failed to update photo profile',
+                    description: 'File size too large, max 2MB',
+                    type: 'danger',
+                });
+            } else if (response.errorMessage) {
+                showMessage({
+                    message: 'Failed to update photo profile',
+                    description: 'Please input jpeg, jpg, or png photo file',
+                    type: 'danger',
+                });
+            } else {
+                showMessage({
+                    message: 'Successfully to select photo profile',
+                    description: 'Please press upload photo image',
+                    type: 'info',
+                    autoHide: false,
+                });
+                this.setState({photo: response});
+            }
+        });
+    };
+
+    openCamera = () => {
+        const options = {mediaType: 'photo'};
+        launchCamera(options, (response) => {
+            if (response.didCancel) {
+            } else if (response.fileSize > 1 * 1024 * 1024) {
+                showMessage({
+                    message: 'Failed to update photo profile',
+                    description: 'File size too large, max 2MB',
+                    type: 'danger',
+                });
+            } else if (response.errorMessage) {
+                showMessage({
+                    message: 'Failed to update photo profile',
+                    description: 'Please input jpeg, jpg, or png photo file',
+                    type: 'danger',
+                });
+            } else {
+                showMessage({
+                    message: 'Successfully to update photo profile',
+                    description: 'Please press upload photo image',
+                    type: 'info',
+                    autoHide: false,
+                });
+                this.setState({photo: response});
+            }
+        });
+    };
+
+    uploadPhoto = async () => {
+        const token = this.props.auth.token;
+        const fileUpload = {
+            uri: this.state.photo.uri,
+            type: this.state.photo.type,
+            name: this.state.photo.fileName,
+        };
+        const file = new FormData();
+        file.append('photo', fileUpload);
+        await http(token).patch('/profile/update-profile-photo', file);
+        await this.props.getUser(token);
+        showMessage({
+            message: 'Uploading your photo...',
+            type: 'warning',
+        });
+        setTimeout(() => {
+            showMessage({
+                message: 'Successfully to update photo profile',
+                type: 'success',
+            });
+            this.setModalVisible(false);
+        }, 3000);
+    };
+
+    doUpdateProfileDetails = async () => {
+        const {email, password, fullName, phoneNumber, repassword} = this.state;
+        if (password === repassword) {
+            const token = this.props.auth.token;
+            await this.props.updateProfileDetails(
+                email,
+                password,
+                fullName,
+                phoneNumber,
+                token,
+            );
+            await this.props.getUser(token);
+            if (this.props.auth.errorMsg === '') {
+                showMessage({
+                    message: 'Success',
+                    description: 'Succesfully to update user profile',
+                    type: 'success',
+                });
+            } else {
+                showMessage({
+                    message: 'Failed',
+                    description: 'Failed to update user profile',
+                    type: 'danger',
+                });
+            }
+        } else {
+            showMessage({
+                message: 'Failed to update user profile',
+                description: 'Password didnt match',
+                type: 'danger',
+            });
+        }
+    };
+
+    async componentDidMount() {
+        if (Object.keys(this.props.auth.profile).length === 0) {
+            const token = this.props.auth.token;
+            await this.props.getUser(token);
+        }
+    }
+
+    render() {
+        const {modalVisible} = this.state;
+        return (
+            <ScrollView>
+                <View style={style.centeredModal}>
+                    <Modal
+                        animationType="fade"
+                        transparent={true}
+                        visible={modalVisible}
+                        onRequestClose={() => {
+                            this.setModalVisible(!modalVisible);
+                        }}>
+                        <View style={style.centeredModal}>
+                            <View style={style.modalView}>
+                                <Text style={style.modalText}>
+                                    Do you want to change your photo ?
+                                </Text>
+                                <TouchableOpacity
+                                    style={style.button}
+                                    onPress={() => this.openGallery()}>
+                                    <Text style={style.textStyle}>
+                                        Choose photo from gallery
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={style.button}
+                                    onPress={() => this.openCamera()}>
+                                    <Text style={style.textStyle}>
+                                        Take new photo from camera
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={style.buttonSelected}
+                                    onPress={() => this.uploadPhoto()}>
+                                    <Text style={style.textStyle}>
+                                        Update with selected photo
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Modal>
+                </View>
+
+                <View style={style.container}>
+                    <View style={style.rowSpaceBetween}>
+                        <Text>INFO</Text>
+                        <TouchableOpacity
+                            onPress={() => this.setModalVisible(true)}>
+                            <Icon name="ellipsis-h" color="#5F2EEA" size={25} />
+                        </TouchableOpacity>
+                    </View>
+                    <View style={style.centeredContent}>
+                        <TouchableOpacity
+                            onPress={() => this.setModalVisible(true)}>
+                            <Image
+                                style={style.userAvatar}
+                                source={
+                                    this.props.auth.profile.photo !== null
+                                        ? {
+                                              uri: `${REACT_APP_API_URL}/${this.props.auth.profile.photo}`,
+                                          }
+                                        : userAvatar
+                                }
+                            />
+                        </TouchableOpacity>
+                        <Text style={text.userName}>
+                            {this.props.auth.profile.fullName !== null
+                                ? this.props.auth.profile.fullName
+                                : 'User'}
+                        </Text>
+                        <Text style={text.userStatus}>Moviegoers</Text>
+                    </View>
+                    <View style={style.lineStyle1} />
+                    <Text style={text.titleSmall}>Loyalty Points</Text>
+                    <View>
+                        <View style={style.userCard}>
+                            <View style={style.rowSpaceBetween}>
+                                <Text style={text.cardMoviegoers}>
+                                    Moviegoers
+                                </Text>
+                                <Image style={style.star} source={star} />
+                            </View>
+                            <View style={style.rowFlexStart}>
+                                <Text style={text.cardPointsValue}>320 </Text>
+                                <Text style={text.cardPointsTitle}>points</Text>
+                            </View>
+                        </View>
+                        <Text style={text.becomeMaster}>
+                            180 points become a master
+                        </Text>
+                    </View>
+                </View>
+
+                <Text style={text.accountSettings}>Account Settings</Text>
+                <View style={style.container}>
+                    <Text style={text.settingsTitle}>Details Information</Text>
+                    <View style={style.lineStyle1} />
+                    <Text style={text.settingsValue}>Full Name</Text>
+                    <View style={style.form}>
+                        <TextInput
+                            style={style.textInput}
+                            placeholder={
+                                this.props.auth.profile.fullName || 'User'
+                            }
+                            onChangeText={(fullName) =>
+                                this.setState({fullName})
+                            }
+                        />
+                    </View>
+                    <Text style={text.settingsValue}>E-mail</Text>
+                    <View style={style.form}>
+                        <TextInput
+                            style={style.textInput}
+                            placeholder={
+                                this.props.auth.profile.email ||
+                                'user@gmail.com'
+                            }
+                            onChangeText={(email) => this.setState({email})}
+                        />
+                    </View>
+                    <Text style={text.settingsValue}>Phone Number</Text>
+                    <View style={style.form}>
+                        <TextInput
+                            style={style.textInput}
+                            keyboardType="phone-pad"
+                            placeholder={
+                                this.props.auth.profile.phoneNumber ||
+                                '081234567890'
+                            }
+                            onChangeText={(phoneNumber) =>
+                                this.setState({phoneNumber})
+                            }
+                        />
+                    </View>
+                </View>
+
+                <View style={style.container}>
+                    <Text style={text.settingsTitle}>Account and Privacy</Text>
+                    <View style={style.lineStyle1} />
+                    <Text style={text.settingsValue}>New Password</Text>
+                    <View style={style.form}>
+                        <TextInput
+                            style={style.textInput}
+                            placeholder="write your new password"
+                            secureTextEntry={this.state.visible}
+                            onChangeText={(password) =>
+                                this.setState({password})
+                            }
+                        />
+                        <TouchableOpacity
+                            onPress={() =>
+                                this.setState({visible: !this.state.visible})
+                            }>
+                            <Icon name="eye" size={15} />
+                        </TouchableOpacity>
+                    </View>
+                    <Text style={text.settingsValue}>Confirm</Text>
+                    <View style={style.form}>
+                        <TextInput
+                            style={style.textInput}
+                            placeholder="repeat your new password"
+                            secureTextEntry={this.state.visible}
+                            onChangeText={(repassword) =>
+                                this.setState({repassword})
+                            }
+                        />
+                        <TouchableOpacity
+                            onPress={() =>
+                                this.setState({visible: !this.state.visible})
+                            }>
+                            <Icon name="eye" size={15} />
+                        </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity onPress={this.doUpdateProfileDetails}>
+                        <View style={style.primary}>
+                            <Text style={style.text}>Update Changes</Text>
+                        </View>
                     </TouchableOpacity>
                 </View>
-                <View style={style.centeredContent}>
-                    <Image style={style.userAvatar} source={userAvatar} />
-                    <Text style={text.userName}>Jonas El Rodriguez</Text>
-                    <Text style={text.userStatus}>Moviegoers</Text>
-                </View>
-                <View style={style.lineStyle1} />
-                <Text style={text.titleSmall}>Loyalty Points</Text>
-                <View>
-                    <View style={style.userCard}>
-                        <View style={style.rowSpaceBetween}>
-                            <Text style={text.cardMoviegoers}>Moviegoers</Text>
-                            <Image style={style.star} source={star} />
-                        </View>
-                        <View style={style.rowFlexStart}>
-                            <Text style={text.cardPointsValue}>320 </Text>
-                            <Text style={text.cardPointsTitle}>points</Text>
-                        </View>
-                    </View>
-                    <Text style={text.becomeMaster}>
-                        180 points become a master
+                <Footer />
+            </ScrollView>
+        );
+    }
+}
+
+class OrderHistory extends Component {
+    render() {
+        return (
+            <ScrollView>
+                <View style={style.container2}>
+                    <Image source={cineone} />
+                    <Text style={text.schedule}>
+                        Tuesday, 07 July 2020 - 04:30pm
                     </Text>
-                </View>
-            </View>
-
-            <Text style={text.accountSettings}>Account Settings</Text>
-            <View style={style.container}>
-                <Text style={text.settingsTitle}>Details Information</Text>
-                <View style={style.lineStyle1} />
-                <Text style={text.settingsValue}>Full Name</Text>
-                <View style={style.form}>
-                    <TextInput
-                        style={style.textInput}
-                        placeholder="Jonas El Rodriguez"
-                    />
-                </View>
-                <Text style={text.settingsValue}>E-mail</Text>
-                <View style={style.form}>
-                    <TextInput
-                        style={style.textInput}
-                        placeholder="jonasrodrigu123@gmail.com"
-                    />
-                </View>
-                <Text style={text.settingsValue}>Phone Number</Text>
-                <View style={style.form}>
-                    <TextInput
-                        style={style.textInput}
-                        keyboardType="phone-pad"
-                        placeholder="081445687121"
-                    />
-                </View>
-            </View>
-
-            <View style={style.container}>
-                <Text style={text.settingsTitle}>Account and Privacy</Text>
-                <View style={style.lineStyle1} />
-                <Text style={text.settingsValue}>New Password</Text>
-                <View style={style.form}>
-                    <TextInput
-                        style={style.textInput}
-                        placeholder="write your new password"
-                        secureTextEntry={true}
-                    />
+                    <Text style={text.movie}>Spider-Man: Homecoming</Text>
+                    <View style={style.lineStyle1} />
                     <TouchableOpacity>
-                        <Icon name="eye" size={15} />
+                        <View style={style.success}>
+                            <Text style={style.text}>Ticket in active</Text>
+                        </View>
                     </TouchableOpacity>
                 </View>
-                <Text style={text.settingsValue}>Confirm</Text>
-                <View style={style.form}>
-                    <TextInput
-                        style={style.textInput}
-                        placeholder="repeat your new password"
-                        secureTextEntry={true}
-                    />
-                    <TouchableOpacity>
-                        <Icon name="eye" size={15} />
-                    </TouchableOpacity>
-                </View>
-                <TouchableOpacity>
-                    <View style={style.primary}>
-                        <Text style={style.text}>Update Changes</Text>
+                <View style={style.container2}>
+                    <Image source={ebv} />
+                    <Text style={text.schedule}>
+                        Monday, 14 June 2020 - 02:00pm
+                    </Text>
+                    <Text style={text.movie}>Avengers: End Game</Text>
+                    <View style={style.lineStyle1} />
+                    <View style={style.disabled}>
+                        <Text style={style.text}>Ticket used</Text>
                     </View>
-                </TouchableOpacity>
-            </View>
-            <Footer />
-        </ScrollView>
-    );
-};
+                </View>
+            </ScrollView>
+        );
+    }
+}
 
-const OrderHistory = () => {
-    return (
-        <ScrollView>
-            <View style={style.container2}>
-                <Image source={cineone} />
-                <Text style={text.schedule}>
-                    Tuesday, 07 July 2020 - 04:30pm
-                </Text>
-                <Text style={text.movie}>Spider-Man: Homecoming</Text>
-                <View style={style.lineStyle1} />
-                <TouchableOpacity>
-                    <View style={style.success}>
-                        <Text style={style.text}>Ticket in active</Text>
-                    </View>
-                </TouchableOpacity>
-            </View>
-            <View style={style.container2}>
-                <Image source={ebv} />
-                <Text style={text.schedule}>
-                    Monday, 14 June 2020 - 02:00pm
-                </Text>
-                <Text style={text.movie}>Avengers: End Game</Text>
-                <View style={style.lineStyle1} />
-                <View style={style.disabled}>
-                    <Text style={style.text}>Ticket used</Text>
-                </View>
-            </View>
-        </ScrollView>
-    );
-};
+const mapStateToProps = (state) => ({auth: state.auth});
+
+const mapDispatchToProps = {updateProfileDetails, getUser};
+
+const DetailsAccountConnected = connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(DetailsAccount);
 
 const Tab = createMaterialTopTabNavigator();
 
 export default function Profile() {
     return (
         <Tab.Navigator>
-            <Tab.Screen name="Details Account" component={DetailsAccount} />
+            <Tab.Screen
+                name="Details Account"
+                component={DetailsAccountConnected}
+            />
             <Tab.Screen name="Order History" component={OrderHistory} />
         </Tab.Navigator>
     );
@@ -191,6 +443,7 @@ const style = StyleSheet.create({
         marginVertical: 32,
         width: 136,
         height: 136,
+        borderRadius: 136 / 2,
     },
     centeredContent: {
         alignItems: 'center',
@@ -249,6 +502,50 @@ const style = StyleSheet.create({
         borderRadius: 4,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    centeredModal: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: '#5F2EEA',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    button: {
+        borderRadius: 20,
+        padding: 10,
+        margin: 5,
+        // elevation: 2,
+        backgroundColor: 'white',
+    },
+    buttonSelected: {
+        borderRadius: 20,
+        padding: 10,
+        marginTop: 50,
+        backgroundColor: 'white',
+    },
+    textStyle: {
+        color: '#5F2EEA',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: 'center',
+        color: 'white',
+        fontWeight: 'bold',
     },
 });
 

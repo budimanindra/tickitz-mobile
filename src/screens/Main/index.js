@@ -14,7 +14,6 @@ import OrderPage from '../OrderPage';
 import PaymentPage from '../PaymentPage';
 import TicketResults from '../TicketResults';
 import AdminPage from '../AdminPage';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Navbar from '../Navbar';
 import NavbarNonMember from '../NavbarNonMember';

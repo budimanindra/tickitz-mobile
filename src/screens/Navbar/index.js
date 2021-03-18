@@ -6,10 +6,11 @@ import {
     StyleSheet,
     Image,
     TextInput,
-    Alert,
 } from 'react-native';
 import Collapsible from 'react-native-collapsible';
 import Icon from 'react-native-vector-icons/FontAwesome';
+
+import {showMessage} from 'react-native-flash-message';
 
 import Logo from '../../assets/V1-Signup.png';
 
@@ -28,8 +29,12 @@ class Navbar extends Component {
 
     doLogout = async () => {
         await this.props.logout();
+        showMessage({
+            message: 'Success',
+            description: 'Succesfully logged out',
+            type: 'success',
+        });
         this.props.navigation.replace('Login');
-        Alert.alert('logged out');
     };
 
     render() {
@@ -66,7 +71,7 @@ class Navbar extends Component {
                         <TextInput style={textInput} placeholder="Search..." />
                     </View>
 
-                    <View style={[content, rowDirection]}>
+                    {/* <View style={[content, rowDirection]}>
                         <Text>Location </Text>
                         <TouchableOpacity>
                             <Icon name="caret-down" size={25} color="grey" />
@@ -86,28 +91,32 @@ class Navbar extends Component {
                         <TouchableOpacity>
                             <Text>Buy Ticket</Text>
                         </TouchableOpacity>
-                    </View>
-                    <View style={content}>
-                        <TouchableOpacity
-                            onPress={() =>
-                                this.props.navigation.navigate('Profile')
-                            }>
-                            <Text>Account Profile</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={content}>
-                        <TouchableOpacity
-                            onPress={() =>
-                                this.props.navigation.navigate('AdminPage')
-                            }>
+                    </View> */}
+
+                    <TouchableOpacity
+                        onPress={() =>
+                            this.props.navigation.navigate('Profile')
+                        }>
+                        <View style={content}>
+                            <Text>Profile</Text>
+                        </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() =>
+                            this.props.navigation.navigate('AdminPage')
+                        }>
+                        <View style={content}>
                             <Text>Admin Page</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={content}>
-                        <TouchableOpacity onPress={this.doLogout}>
+                        </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={this.doLogout}>
+                        <View style={content}>
                             <Text>Log Out</Text>
-                        </TouchableOpacity>
-                    </View>
+                        </View>
+                    </TouchableOpacity>
+
                     <View style={trademark}>
                         <Text style={trademarkText}>
                             © 2020 Tickitz. All Rights Reserved.

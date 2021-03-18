@@ -277,16 +277,18 @@ const style = StyleSheet.create({
         marginBottom: 56,
     },
     movieTitle: {
+        height: 60,
         fontSize: 14,
         fontWeight: 'bold',
         textAlign: 'center',
         marginVertical: 12,
     },
     movieGenre: {
+        height: 40,
         fontSize: 11,
         color: '#A0A3BD',
         textAlign: 'center',
-        marginBottom: 24,
+        marginBottom: 12,
     },
     sectionUpcoming: {
         paddingTop: 80,

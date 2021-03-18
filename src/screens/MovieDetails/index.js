@@ -247,9 +247,7 @@ export class MovieDetails extends Component {
                         defaultValue={this.state.selectedDate}
                         containerStyle={{
                             width: 150,
-                            // height: 50,
                             marginLeft: 24,
-                            // marginRight: 12,
                         }}
                         onChangeItem={(item) =>
                             this.setState({
@@ -272,8 +270,6 @@ export class MovieDetails extends Component {
                         defaultValue={this.state.selectedLocation}
                         containerStyle={{
                             width: 150,
-                            // height: 50,
-                            // marginLeft: 12,
                             marginRight: 24,
                         }}
                         onChangeItem={(item) =>

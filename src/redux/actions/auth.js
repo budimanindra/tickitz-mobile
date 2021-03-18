@@ -1,5 +1,4 @@
 import http from '../../helpers/http';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const resetError = () => {
     return async (dispatch) => {
@@ -21,7 +20,6 @@ export const login = (username, password) => {
                 payload: null,
             });
             const results = await http().post('/auth/login', params);
-            AsyncStorage.setItem('token', results.data.token);
             dispatch({
                 type: 'LOGIN',
                 payload: results.data.token,
@@ -63,16 +61,67 @@ export const register = (username, password) => {
 
 export const logout = () => {
     return async (dispatch) => {
-        AsyncStorage.removeItem('token');
         try {
             dispatch({
                 type: 'LOGOUT',
-                payload: null,
             });
         } catch (err) {
             dispatch({
                 type: 'LOGOUT',
-                payload: null,
+            });
+        }
+    };
+};
+
+export const getUser = (token) => {
+    return async (dispatch) => {
+        try {
+            const results = await http(token).get('/profile/');
+            dispatch({
+                type: 'UPDATE_PROFILE_DETAILS',
+                payload: results.data.results,
+            });
+        } catch (err) {
+            const {message} = err.response.data;
+            dispatch({
+                type: 'SET_UPDATE_PROFILE_DETAILS_MESSAGE',
+                payload: message,
+            });
+        }
+    };
+};
+
+export const updateProfileDetails = (
+    email,
+    password,
+    fullName,
+    phoneNumber,
+    token,
+) => {
+    return async (dispatch) => {
+        const params = new URLSearchParams();
+        params.append('fullName', fullName);
+        params.append('email', email);
+        params.append('phoneNumber', phoneNumber);
+        params.append('password', password);
+        try {
+            const results = await http(token).patch(
+                '/profile/update-profile-details',
+                params,
+            );
+            dispatch({
+                type: 'SET_LOGIN_MESSAGE',
+                payload: '',
+            });
+            dispatch({
+                type: 'UPDATE_PROFILE_DETAILS',
+                payload: results.data.results,
+            });
+        } catch (err) {
+            const {message} = err.response.data;
+            dispatch({
+                type: 'SET_UPDATE_PROFILE_DETAILS_MESSAGE',
+                payload: message,
             });
         }
     };

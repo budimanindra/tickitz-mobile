@@ -7,7 +7,6 @@ import {
     Image,
     ScrollView,
     TextInput,
-    Alert,
     Modal,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -84,7 +83,7 @@ export class PaymentPage extends Component {
                                     transaction
                                 </Text>
                                 <TouchableOpacity
-                                    style={[style.button, style.buttonClose]}
+                                    style={[button.modal, button.modalClose]}
                                     onPress={() =>
                                         this.props.navigation.navigate('Login')
                                     }>
@@ -378,14 +377,6 @@ const style = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5,
     },
-    button: {
-        borderRadius: 20,
-        padding: 10,
-        elevation: 2,
-    },
-    buttonClose: {
-        backgroundColor: 'white',
-    },
     textStyle: {
         color: '#5F2EEA',
         fontWeight: 'bold',
@@ -457,6 +448,14 @@ const button = StyleSheet.create({
     },
     confirm: {
         marginTop: 56,
+    },
+    modal: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2,
+    },
+    modalClose: {
+        backgroundColor: 'white',
     },
 });
 

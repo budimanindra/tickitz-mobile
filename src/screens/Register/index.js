@@ -11,6 +11,8 @@ import {
 
 import {connect} from 'react-redux';
 
+import {showMessage} from 'react-native-flash-message';
+
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import Logo from '../../assets/V1-Signup.png';
@@ -29,6 +31,19 @@ class Register extends Component {
     doRegister = async () => {
         const {email, password} = this.state;
         await this.props.register(email, password);
+        if (this.props.auth.token !== null) {
+            showMessage({
+                message: 'Success',
+                description: 'Succesfully to register an account',
+                type: 'success',
+            });
+        } else {
+            showMessage({
+                message: 'Failed',
+                description: 'Failed to register an account',
+                type: 'danger',
+            });
+        }
     };
 
     render() {
@@ -70,10 +85,6 @@ class Register extends Component {
                             <Icon name="eye" size={25} />
                         </TouchableOpacity>
                     </View>
-
-                    <Text style={style.alertText}>
-                        {this.props.auth.errorMsg}
-                    </Text>
 
                     <TouchableOpacity onPress={this.doRegister}>
                         <View style={button.primary}>
