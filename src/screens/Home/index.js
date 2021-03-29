@@ -7,7 +7,6 @@ import {
     StyleSheet,
     TouchableOpacity,
     ScrollView,
-    Button,
 } from 'react-native';
 
 import http from '../../helpers/http';
@@ -108,7 +107,10 @@ class Home extends Component {
                 <View style={style.sectionNowShowing}>
                     <View style={style.sectionDirection}>
                         <Text style={style.sectionTitle}>Now Showing</Text>
-                        <TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() =>
+                                this.props.navigation.navigate('ViewAllShowing')
+                            }>
                             <Text style={style.clickableText}>View all</Text>
                         </TouchableOpacity>
                     </View>
@@ -158,7 +160,12 @@ class Home extends Component {
                 <View style={style.sectionUpcoming}>
                     <View style={style.sectionDirection}>
                         <Text style={style.sectionTitle}>Upcoming Movies</Text>
-                        <TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() =>
+                                this.props.navigation.navigate(
+                                    'ViewAllUpcoming',
+                                )
+                            }>
                             <Text style={style.clickableText}>View all</Text>
                         </TouchableOpacity>
                     </View>
