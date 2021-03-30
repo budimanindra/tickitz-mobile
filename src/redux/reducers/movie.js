@@ -3,6 +3,10 @@ const initialState = {
     showDate: [],
     showLocation: [],
     availCinema: [],
+    pageInfoContact: null,
+    upcomingMovie: [],
+    message: '',
+    errorMsg: null,
     // isLoading: true,
     // isDateLoading: true,
     // isLocationLoading: true,
@@ -33,6 +37,29 @@ function movie(state = initialState, action) {
             return {
                 ...state,
                 availCinema: action.payload,
+            };
+        }
+        case 'GET_UPCOMING_MOVIES': {
+            return {
+                ...state,
+                upcomingMovie: action.payload,
+                pageInfoContact: action.pageInfo,
+            };
+        }
+        case 'PAGING_GET_UPCOMING_MOVIES': {
+            const oldData = state.upcomingMovie;
+            const newData = [...oldData, ...action.payload];
+            return {
+                ...state,
+                upcomingMovie: newData,
+                pageInfoContact: action.pageInfo,
+            };
+        }
+        case 'SET_USER_MESSAGE': {
+            return {
+                ...state,
+                errorMsg: action.payload,
+                message: '',
             };
         }
         // case 'TOGGLE_MOVIE_LOADING': {

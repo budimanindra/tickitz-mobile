@@ -7,71 +7,159 @@ import {
     StyleSheet,
     TouchableOpacity,
     ScrollView,
+    FlatList,
 } from 'react-native';
 
 import {Picker} from '@react-native-picker/picker';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import {connect} from 'react-redux';
+import {
+    getUpcomingMovies,
+    pagingGetUpcomingMovies,
+} from '../../redux/actions/movie';
 
 export class ViewAllUpcoming extends Component {
     state = {
+        loading: false,
+        message: '',
+        search: '',
         sort: '',
     };
 
+    sort = async (value) => {
+        this.setState({loading: true, sort: value});
+        await this.props.getUpcomingMovies(null, null, value);
+        if (this.props.movie.upcomingMovie.length > 0) {
+            this.setState({
+                message: '',
+                loading: false,
+            });
+        } else {
+            this.setState({
+                message: `${value} Not Found`,
+                loading: false,
+            });
+        }
+    };
+
+    next = async () => {
+        if (
+            this.props.movie.pageInfoContact &&
+            this.props.movie.pageInfoContact.currentPage <
+                this.props.movie.pageInfoContact.totalPage
+        ) {
+            const {search, sort} = this.state;
+            await this.props.pagingGetUpcomingMovies(
+                search,
+                this.props.movie.pageInfoContact.currentPage + 1,
+                sort,
+            );
+        }
+    };
+
+    search = async (value) => {
+        this.setState({loading: true, search: value});
+        await this.props.getUpcomingMovies(value);
+        if (this.props.movie.upcomingMovie.length > 0) {
+            this.setState({
+                message: '',
+                loading: false,
+            });
+        } else {
+            this.setState({
+                message: `${value} Not Found`,
+                loading: false,
+            });
+        }
+    };
+
+    async componentDidMount() {
+        await this.props.getUpcomingMovies();
+    }
+
     render() {
+        const {upcomingMovie} = this.props.movie;
         return (
-            <ScrollView>
-                <View style={styles.container}>
-                    <Text style={styles.title}> Now Upcoming Movies </Text>
-                    <TextInput
-                        style={styles.form}
-                        placeholder="Search movie . . ."
-                        onChangeText={(email) => this.setState({email})}
+            <View style={styles.container}>
+                <Text style={styles.title}> Now Upcoming Movies </Text>
+                <TextInput
+                    style={styles.textInput}
+                    placeholder="Search receiver here"
+                    onChangeText={(value) => this.search(value)}
+                />
+                <Picker
+                    selectedValue={this.state.sort}
+                    onValueChange={(itemValue) => this.sort(itemValue)}>
+                    <Picker.Item label="Sort" />
+                    <Picker.Item label="Movie name" value="name" />
+                    <Picker.Item label="Release" value="releaseDate" />
+                </Picker>
+                <View style={styles.centered}>
+                    <FlatList
+                        showsVerticalScrollIndicator={false}
+                        data={upcomingMovie}
+                        keyExtractor={(item) => item.id}
+                        renderItem={({item}) => {
+                            return (
+                                <View style={button.card}>
+                                    <Image
+                                        source={{
+                                            uri: item.image,
+                                        }}
+                                        style={button.moviePoster}
+                                    />
+                                    <Text style={styles.movieTitle}>
+                                        {item.name}
+                                    </Text>
+                                    <Text style={styles.movieGenre}>
+                                        {item.genreName}
+                                    </Text>
+                                    <TouchableOpacity
+                                        key={`Now Showing Movie: ${item.id}`}
+                                        onPress={() =>
+                                            this.props.navigation.navigate(
+                                                'MovieDetails',
+                                                {
+                                                    movieId: item.id,
+                                                },
+                                            )
+                                        }>
+                                        <View style={button.secondary}>
+                                            <Text style={button.textSecondary}>
+                                                Details
+                                            </Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                </View>
+                            );
+                        }}
+                        onEndReached={this.next}
+                        onEndReachedThreshold={0.5}
                     />
-                    <Picker
-                        selectedValue={this.state.sort}
-                        onValueChange={(itemValue) => this.sort(itemValue)}>
-                        <Picker.Item label="Sort movie" />
-                        <Picker.Item label="By name" value="name" />
-                        <Picker.Item
-                            label="By released date"
-                            value="releaseDate"
-                        />
-                    </Picker>
-                    <View style={styles.cardPosition}>
-                        <TouchableOpacity style={styles.card}>
-                            <Image source={{}} style={styles.movieImage} />
-                            <Text style={styles.movieTitle}>Movie name</Text>
-                            <Text style={styles.movieReleaseDate}>
-                                Release date
-                            </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.card}>
-                            <Image source={{}} style={styles.movieImage} />
-                            <Text style={styles.movieTitle}>Movie name</Text>
-                            <Text style={styles.movieReleaseDate}>
-                                Release date
-                            </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.card}>
-                            <Image source={{}} style={styles.movieImage} />
-                            <Text style={styles.movieTitle}>Movie name</Text>
-                            <Text style={styles.movieReleaseDate}>
-                                Release date
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
                 </View>
-            </ScrollView>
+                {/* </View> */}
+            </View>
         );
     }
 }
+const mapStateToProps = (state) => ({
+    movie: state.movie,
+});
 
-export default ViewAllUpcoming;
+const mapDispatchToProps = {
+    getUpcomingMovies,
+    pagingGetUpcomingMovies,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ViewAllUpcoming);
 
 const styles = StyleSheet.create({
     container: {
         paddingVertical: 30,
         paddingHorizontal: 40,
+    },
+    centered: {
+        alignItems: 'center',
+        marginBottom: 290,
     },
     title: {
         textAlign: 'center',
@@ -106,12 +194,76 @@ const styles = StyleSheet.create({
         width: 120,
         height: 180,
     },
-    movieTitle: {
-        fontSize: 14,
-        fontWeight: 'bold',
-    },
     movieReleaseDate: {
         fontSize: 14,
         fontWeight: 'bold',
+    },
+    movieTitle: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginVertical: 12,
+    },
+    movieGenre: {
+        fontSize: 11,
+        color: '#A0A3BD',
+        textAlign: 'center',
+        marginBottom: 12,
+    },
+});
+
+const button = StyleSheet.create({
+    contentDirection: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginTop: 64,
+    },
+    posterMiddle: {
+        marginTop: 28,
+    },
+    posterLeft: {
+        marginTop: 60,
+    },
+    poster: {
+        width: 94.82,
+        height: 311.98,
+        borderRadius: 10,
+    },
+    card: {
+        marginTop: 24,
+        borderRadius: 6,
+        borderColor: '#DEDEDE',
+        borderWidth: 1,
+        padding: 16,
+        marginRight: 16,
+        width: 155,
+    },
+    moviePoster: {
+        width: 122,
+        height: 185,
+        borderRadius: 6,
+    },
+    primary: {
+        backgroundColor: '#5F2EEA',
+        height: 54,
+        borderRadius: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    secondary: {
+        backgroundColor: 'white',
+        borderColor: '#5F2EEA',
+        borderWidth: 1,
+        height: 25,
+        width: 120,
+        borderRadius: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    textSecondary: {
+        color: '#5F2EEA',
+    },
+    textPrimary: {
+        color: 'white',
     },
 });
