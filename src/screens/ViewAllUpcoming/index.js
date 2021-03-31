@@ -82,7 +82,7 @@ export class ViewAllUpcoming extends Component {
                 <Text style={styles.title}>Upcoming Movies</Text>
                 <TextInput
                     style={styles.textInput}
-                    placeholder="Search receiver here"
+                    placeholder="Search movie here . . ."
                     onChangeText={(value) => this.search(value)}
                 />
                 <Picker
@@ -237,5 +237,11 @@ const styles = StyleSheet.create({
     },
     btnTextSecondary: {
         color: '#5F2EEA',
+    },
+    textInput: {
+        textAlign: 'center',
+        borderWidth: 1,
+        borderColor: '#DADADA',
+        borderRadius: 5,
     },
 });

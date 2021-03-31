@@ -40,7 +40,6 @@ class Navbar extends Component {
     render() {
         const {
             collapsible,
-            rowDirection,
             form,
             textInput,
             header,
@@ -102,14 +101,14 @@ class Navbar extends Component {
                         </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         onPress={() =>
                             this.props.navigation.navigate('AdminPage')
                         }>
                         <View style={content}>
                             <Text>Admin Page</Text>
                         </View>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
                     <TouchableOpacity onPress={this.doLogout}>
                         <View style={content}>

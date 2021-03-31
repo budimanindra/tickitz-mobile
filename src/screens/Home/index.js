@@ -67,7 +67,7 @@ class Home extends Component {
                     </View>
 
                     <View style={button.contentDirection}>
-                        <TouchableOpacity style={button.posterLeft}>
+                        <View style={button.posterLeft}>
                             <View>
                                 <Image
                                     source={{
@@ -77,8 +77,8 @@ class Home extends Component {
                                     style={button.poster}
                                 />
                             </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={button.posterMiddle}>
+                        </View>
+                        <View style={button.posterMiddle}>
                             <View>
                                 <Image
                                     source={{
@@ -88,8 +88,8 @@ class Home extends Component {
                                     style={button.poster}
                                 />
                             </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity>
+                        </View>
+                        <View>
                             <View>
                                 <Image
                                     source={{
@@ -99,7 +99,7 @@ class Home extends Component {
                                     style={button.poster}
                                 />
                             </View>
-                        </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
 
