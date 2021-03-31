@@ -12,11 +12,11 @@ import {
 import {Picker} from '@react-native-picker/picker';
 import {connect} from 'react-redux';
 import {
-    getUpcomingMovies,
-    pagingGetUpcomingMovies,
+    getNowShowingMovies,
+    pagingGetNowShowingMovies,
 } from '../../redux/actions/movie';
 
-export class ViewAllUpcoming extends Component {
+export class ViewAllNowShowing extends Component {
     state = {
         loading: false,
         message: '',
@@ -26,8 +26,24 @@ export class ViewAllUpcoming extends Component {
 
     sort = async (value) => {
         this.setState({loading: true, sort: value});
-        await this.props.getUpcomingMovies(null, null, value);
-        if (this.props.movie.upcomingMovie.length > 0) {
+        await this.props.getNowShowingMovies(null, null, value);
+        if (this.props.movie.nowShowingMovie.length > 0) {
+            this.setState({
+                message: '',
+                loading: false,
+            });
+        } else {
+            this.setState({
+                message: `${value} Not Found`,
+                loading: false,
+            });
+        }
+    };
+
+    search = async (value) => {
+        this.setState({loading: true, search: value});
+        await this.props.getNowShowingMovies(value);
+        if (this.props.movie.nowShowingMovie.length > 0) {
             this.setState({
                 message: '',
                 loading: false,
@@ -42,44 +58,28 @@ export class ViewAllUpcoming extends Component {
 
     next = async () => {
         if (
-            this.props.movie.pageInfoUpcomingMovie &&
-            this.props.movie.pageInfoUpcomingMovie.currentPage <
-                this.props.movie.pageInfoUpcomingMovie.totalPage
+            this.props.movie.pageInfoNowShowingMovie &&
+            this.props.movie.pageInfoNowShowingMovie.currentPage <
+                this.props.movie.pageInfoNowShowingMovie.totalPage
         ) {
             const {search, sort} = this.state;
-            await this.props.pagingGetUpcomingMovies(
+            await this.props.pagingGetNowShowingMovies(
                 search,
-                this.props.movie.pageInfoUpcomingMovie.currentPage + 1,
+                this.props.movie.pageInfoNowShowingMovie.currentPage + 1,
                 sort,
             );
         }
     };
 
-    search = async (value) => {
-        this.setState({loading: true, search: value});
-        await this.props.getUpcomingMovies(value);
-        if (this.props.movie.upcomingMovie.length > 0) {
-            this.setState({
-                message: '',
-                loading: false,
-            });
-        } else {
-            this.setState({
-                message: `${value} Not Found`,
-                loading: false,
-            });
-        }
-    };
-
     async componentDidMount() {
-        await this.props.getUpcomingMovies();
+        await this.props.getNowShowingMovies();
     }
 
     render() {
-        const {upcomingMovie} = this.props.movie;
+        const {nowShowingMovie} = this.props.movie;
         return (
             <View style={styles.container}>
-                <Text style={styles.title}>Upcoming Movies</Text>
+                <Text style={styles.title}>Now Showing Movies</Text>
                 <TextInput
                     style={styles.textInput}
                     placeholder="Search receiver here"
@@ -97,7 +97,7 @@ export class ViewAllUpcoming extends Component {
                 <View style={styles.centered}>
                     <FlatList
                         showsVerticalScrollIndicator={false}
-                        data={upcomingMovie}
+                        data={nowShowingMovie}
                         keyExtractor={(item) => item.id}
                         renderItem={({item}) => {
                             return (
@@ -147,11 +147,11 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = {
-    getUpcomingMovies,
-    pagingGetUpcomingMovies,
+    getNowShowingMovies,
+    pagingGetNowShowingMovies,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ViewAllUpcoming);
+export default connect(mapStateToProps, mapDispatchToProps)(ViewAllNowShowing);
 
 const styles = StyleSheet.create({
     container: {

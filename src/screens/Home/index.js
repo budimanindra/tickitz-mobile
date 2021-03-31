@@ -109,7 +109,9 @@ class Home extends Component {
                         <Text style={style.sectionTitle}>Now Showing</Text>
                         <TouchableOpacity
                             onPress={() =>
-                                this.props.navigation.navigate('ViewAllShowing')
+                                this.props.navigation.navigate(
+                                    'ViewAllNowShowing',
+                                )
                             }>
                             <Text style={style.clickableText}>View all</Text>
                         </TouchableOpacity>

@@ -13,7 +13,7 @@ import MovieDetails from '../MovieDetails';
 import OrderPage from '../OrderPage';
 import PaymentPage from '../PaymentPage';
 import TicketResults from '../TicketResults';
-import ViewAllShowing from '../ViewAllShowing';
+import ViewAllNowShowing from '../ViewAllNowShowing';
 import ViewAllUpcoming from '../ViewAllUpcoming';
 import AdminPage from '../AdminPage';
 
@@ -97,11 +97,11 @@ class Main extends Component {
                             name="Home"
                         />
                         <Stack.Screen
-                            component={ViewAllShowing}
+                            component={ViewAllNowShowing}
                             options={() => ({
                                 header: (props) => <Navbar {...props} />,
                             })}
-                            name="ViewAllShowing"
+                            name="ViewAllNowShowing"
                         />
                         <Stack.Screen
                             component={ViewAllUpcoming}

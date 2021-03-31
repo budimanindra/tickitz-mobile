@@ -3,8 +3,10 @@ const initialState = {
     showDate: [],
     showLocation: [],
     availCinema: [],
-    pageInfoContact: null,
+    pageInfoUpcomingMovie: null,
+    pageInfoNowShowingMovie: null,
     upcomingMovie: [],
+    nowShowingMovie: [],
     message: '',
     errorMsg: null,
     // isLoading: true,
@@ -43,7 +45,7 @@ function movie(state = initialState, action) {
             return {
                 ...state,
                 upcomingMovie: action.payload,
-                pageInfoContact: action.pageInfo,
+                pageInfoUpcomingMovie: action.pageInfo,
             };
         }
         case 'PAGING_GET_UPCOMING_MOVIES': {
@@ -52,7 +54,23 @@ function movie(state = initialState, action) {
             return {
                 ...state,
                 upcomingMovie: newData,
-                pageInfoContact: action.pageInfo,
+                pageInfoUpcomingMovie: action.pageInfo,
+            };
+        }
+        case 'GET_NOW_SHOWING_MOVIES': {
+            return {
+                ...state,
+                nowShowingMovie: action.payload,
+                pageInfoNowShowingMovie: action.pageInfo,
+            };
+        }
+        case 'PAGING_NOW_SHOWING_MOVIES': {
+            const oldData = state.nowShowingMovie;
+            const newData = [...oldData, ...action.payload];
+            return {
+                ...state,
+                nowShowingMovie: newData,
+                pageInfoNowShowingMovie: action.pageInfo,
             };
         }
         case 'SET_USER_MESSAGE': {
