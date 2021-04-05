@@ -8,7 +8,6 @@ import {
     ScrollView,
     TextInput,
     Modal,
-    ActivityIndicator,
 } from 'react-native';
 
 import {REACT_APP_API_URL} from '@env';
@@ -228,7 +227,7 @@ class DetailsAccount extends Component {
                             <Image
                                 style={style.userAvatar}
                                 source={
-                                    this.props.auth.profile.photo !== null
+                                    this.props.auth.profile.photo
                                         ? {
                                               uri: `${REACT_APP_API_URL}/${this.props.auth.profile.photo}`,
                                           }

@@ -18,7 +18,10 @@ import {
     getShowLocation,
     getAvailCinema,
 } from '../../redux/actions/movie';
+
 import http from '../../helpers/http';
+
+import {showMessage} from 'react-native-flash-message';
 
 export class MovieDetails extends Component {
     state = {
@@ -27,6 +30,7 @@ export class MovieDetails extends Component {
         selectedLocation: null,
         selectedIdShowtime: '',
         selectedShowtime: '',
+        selectedCinemaIndex: -1,
         styleChecker: '',
         finish: false,
     };
@@ -36,6 +40,7 @@ export class MovieDetails extends Component {
             selectedShowtime: showtime,
             selectedIdShowtime: idShowtime,
             styleChecker: `${index} - ${idShowtime}`,
+            selectedCinemaIndex: index,
         });
     }
 
@@ -51,6 +56,13 @@ export class MovieDetails extends Component {
         return data;
     };
 
+    alert = () => {
+        showMessage({
+            message: 'Please insert showtime to proceed',
+            type: 'warning',
+        });
+    };
+
     generateListDate = (data) => {
         let listDate = [];
         const today = new Date();
@@ -58,19 +70,20 @@ export class MovieDetails extends Component {
         let endDate = data.endDate;
         let strDate = todayString;
         let index = 1;
-        let dateMove = new Date(todayString);
+        let dateMove = new Date();
 
-        while (strDate < endDate) {
-            strDate = dateMove.toISOString().slice(0, 10);
+        while (strDate <= endDate) {
             let dateObject = {id: index, readable: strDate};
             listDate.push(dateObject);
             dateMove.setDate(dateMove.getDate() + 1);
+            strDate = dateMove.toISOString().slice(0, 10);
             index++;
         }
         return listDate;
     };
 
     async componentDidMount() {
+        this.props.getAvailCinema([]);
         const {movieId} = this.props.route.params;
         const resultsDetailMovie = await http().get(`/movies/${movieId}`);
         console.log(resultsDetailMovie);
@@ -245,6 +258,7 @@ export class MovieDetails extends Component {
                             }))
                         }
                         defaultValue={this.state.selectedDate}
+                        placeholder="Select a date"
                         containerStyle={{
                             width: 150,
                             marginLeft: 24,
@@ -268,6 +282,7 @@ export class MovieDetails extends Component {
                             }))
                         }
                         defaultValue={this.state.selectedLocation}
+                        placeholder="Select a city"
                         containerStyle={{
                             width: 150,
                             marginRight: 24,
@@ -283,7 +298,11 @@ export class MovieDetails extends Component {
                 {this.props.movie.availCinema.map((cinema, index) => (
                     <View style={style.container3}>
                         <View style={style.cardAlign}>
-                            <Image source={cinema.image} />
+                            <Image
+                                style={style.gede}
+                                source={{uri: cinema.image}}
+                                resizeMode="contain"
+                            />
                             <Text style={text.cinemaAddress}>
                                 {cinema.address}
                             </Text>
@@ -306,18 +325,24 @@ export class MovieDetails extends Component {
 
                         <View style={style.movieButton}>
                             <TouchableOpacity
+                                key={cinema.id}
                                 onPress={() =>
-                                    this.props.navigation.navigate(
-                                        'OrderPage',
-                                        {
-                                            cinemaId: cinema.id,
-                                            showtimeId: this.state
-                                                .selectedIdShowtime,
-                                            time: this.state.selectedShowtime,
-                                            date: this.state.selectedDateString,
-                                            price: cinema.priceWeekend,
-                                        },
-                                    )
+                                    this.state.selectedShowtime &&
+                                    this.state.selectedCinemaIndex === index
+                                        ? this.props.navigation.navigate(
+                                              'OrderPage',
+                                              {
+                                                  cinemaId: cinema.id,
+                                                  showtimeId: this.state
+                                                      .selectedIdShowtime,
+                                                  time: this.state
+                                                      .selectedShowtime,
+                                                  date: this.state
+                                                      .selectedDateString,
+                                                  price: cinema.priceWeekend,
+                                              },
+                                          )
+                                        : this.alert()
                                 }>
                                 <View style={button.primary}>
                                     <Text style={button.text}>Book now</Text>
@@ -400,6 +425,10 @@ const style = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+    },
+    gede: {
+        height: 100,
+        width: 100,
     },
 });
 
