@@ -1,7 +1,7 @@
 <h1 align='center'>Tickitz !<br>Ticket Booking Application</h1>
 
-![alt text](https://github.com/budimanindra/tickitz-mobile/blob/main/sstickitz1.PNG?raw=true)
-![alt text](https://github.com/budimanindra/tickitz-mobile/blob/main/sstickitz2.PNG?raw=true)
+![alt text](https://github.com/budimanindra/tickitz-mobile/blob/main/sstickitz1.png?raw=true)
+![alt text](https://github.com/budimanindra/tickitz-mobile/blob/main/sstickitz2.png?raw=true)
 <br>
 <br>
 
