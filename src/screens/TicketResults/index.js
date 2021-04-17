@@ -1,16 +1,24 @@
 import React, {Component} from 'react';
 import {Text, View, StyleSheet, Image, ScrollView} from 'react-native';
-
-import http from '../../helpers/http';
-
 import {connect} from 'react-redux';
+import {saveTicketHistory} from '../../redux/actions/transaction';
 
 import Footer from '../../components/Footer';
-
 import Success from '../../assets/success.png';
 import Barcode from '../../assets/barcode.png';
 
 export class TicketResults extends Component {
+    async componentDidMount() {
+        await this.props.saveTicketHistory(
+            this.props.auth.token,
+            this.props.movie.details.name,
+            this.props.transaction.transactionDetails.date,
+            this.props.transaction.transactionDetails.time,
+            this.props.route.params.cinemaImage,
+            this.props.route.params.cinemaAddress,
+        );
+    }
+
     render() {
         return (
             <ScrollView>
@@ -187,8 +195,11 @@ const text = StyleSheet.create({
 });
 
 const mapStateToProps = (state) => ({
+    auth: state.auth,
     transaction: state.transaction,
     movie: state.movie,
 });
 
-export default connect(mapStateToProps)(TicketResults);
+const mapDispatchToProps = {saveTicketHistory};
+
+export default connect(mapStateToProps, mapDispatchToProps)(TicketResults);

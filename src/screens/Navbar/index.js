@@ -34,7 +34,6 @@ class Navbar extends Component {
             description: 'Succesfully logged out',
             type: 'success',
         });
-        this.props.navigation.replace('Login');
     };
 
     render() {

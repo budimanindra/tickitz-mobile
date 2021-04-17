@@ -11,6 +11,8 @@ import {
 
 import {connect} from 'react-redux';
 
+import {validatePassword, validateEmail} from '../../helpers/validation';
+
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import Logo from '../../assets/V1-Signup.png';
@@ -26,6 +28,8 @@ class Login extends Component {
         visible: true,
         email: '',
         password: '',
+        messagePassword: '',
+        messageEmail: '',
     };
 
     doLogin = async () => {
@@ -40,10 +44,28 @@ class Login extends Component {
         } else {
             showMessage({
                 message: 'Failed',
-                description: 'Wrong email or password',
+                description: `${this.props.auth.errorMsg}`,
                 type: 'danger',
             });
         }
+    };
+
+    handlePasswordChange = (password) => {
+        const {valid, message} = validatePassword(password);
+        if (valid) {
+            this.setState({password: password});
+        }
+        this.setState({password: password});
+        this.setState({messagePassword: message});
+    };
+
+    handleEmailChange = (email) => {
+        const {valid, message} = validateEmail(email);
+        if (valid) {
+            this.setState({email: email});
+        }
+        this.setState({email: email});
+        this.setState({messageEmail: message});
     };
 
     render() {
@@ -64,9 +86,14 @@ class Login extends Component {
                             style={style.form}
                             keyboardType="email-address"
                             placeholder="write your email"
-                            onChangeText={(email) => this.setState({email})}
+                            onChangeText={(email) =>
+                                this.handleEmailChange(email)
+                            }
                         />
                     </View>
+                    <Text style={style.validation}>
+                        {this.state.messageEmail}
+                    </Text>
 
                     <Text>Password</Text>
                     <View style={style.form}>
@@ -75,7 +102,7 @@ class Login extends Component {
                             placeholder="write your password"
                             secureTextEntry={this.state.visible}
                             onChangeText={(password) =>
-                                this.setState({password})
+                                this.handlePasswordChange(password)
                             }
                         />
                         <TouchableOpacity
@@ -85,6 +112,9 @@ class Login extends Component {
                             <Icon name="eye" size={25} />
                         </TouchableOpacity>
                     </View>
+                    <Text style={style.validation}>
+                        {this.state.messagePassword}
+                    </Text>
 
                     <TouchableOpacity onPress={this.doLogin}>
                         <View style={button.primary}>
@@ -139,15 +169,17 @@ const style = StyleSheet.create({
         marginTop: 46.48,
         marginBottom: 41,
     },
+    validation: {
+        color: '#f54254',
+        marginBottom: 15,
+    },
     form: {
-        // flex: 1,
         borderRadius: 4,
         borderWidth: 1,
         backgroundColor: '#FCFDFE',
         borderColor: '#DEDEDE',
         paddingHorizontal: 20,
         marginTop: 12,
-        marginBottom: 25,
         flexDirection: 'row',
         alignItems: 'center',
     },

@@ -93,6 +93,8 @@ export class OrderPage extends Component {
             date,
             price,
             time,
+            cinemaImage,
+            cinemaAddress,
         } = this.props.route.params;
         const seatPosition = this.state.seatPosition;
         const totalPrice = price * this.state.seat.length;
@@ -109,7 +111,10 @@ export class OrderPage extends Component {
             time,
         });
 
-        this.props.navigation.navigate('PaymentPage');
+        this.props.navigation.navigate('PaymentPage', {
+            cinemaImage,
+            cinemaAddress,
+        });
     };
 
     async componentDidMount() {

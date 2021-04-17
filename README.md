@@ -9,7 +9,7 @@
 
 [![React Native](https://img.shields.io/badge/react%20native-v0.64.0-blue)](https://facebook.github.io/react-native/)
 
-<p align='justify'>Tickitz is a movie ticket online booking application. With this app you can book showing movies in various cities and know upcoming movies. This app built with React Native..</p>
+<p align='justify'>Tickitz is an application that helps people to online booking for movies. With tickitz you can easily book showing movies in various cities and know details of upcoming movies. Tickitz packed with many features like upcoming and showing movie details, availability seat info, order history and details, update user profile. This app was built with the latest technology such as React Native, Express JS, Node JS, Redux, and MySQL</p>
 
 ## Requirements
 
@@ -27,7 +27,7 @@
 
 ## Download the APK
 
-You can Download the APK [`here`](http://bit.ly/tickitz)
+You can Download the APK [`here`](http://bit.ly/tickitz-mobile)
 
 ## License
 

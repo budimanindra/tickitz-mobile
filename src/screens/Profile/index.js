@@ -17,10 +17,9 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import http from '../../helpers/http';
 
 import {showMessage} from 'react-native-flash-message';
-
 import {connect} from 'react-redux';
-
 import {updateProfileDetails, getUser} from '../../redux/actions/auth';
+import {getTicketHistory} from '../../redux/actions/transaction';
 
 import Footer from '../../components/Footer';
 
@@ -356,46 +355,73 @@ class DetailsAccount extends Component {
 }
 
 class OrderHistory extends Component {
+    state = {
+        today: null,
+    };
+
+    async componentDidMount() {
+        this.props.getTicketHistory(this.props.auth.token);
+        const showDate = this.getToday();
+        this.setState({today: showDate});
+    }
+
+    dateTicketCompare(ticketDate) {
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        const result = todayStr <= ticketDate;
+        return result;
+    }
+
     render() {
         return (
             <ScrollView>
-                <View style={style.container2}>
-                    <Image source={cineone} />
-                    <Text style={text.schedule}>
-                        Tuesday, 07 July 2020 - 04:30pm
-                    </Text>
-                    <Text style={text.movie}>Spider-Man: Homecoming</Text>
-                    <View style={style.lineStyle1} />
-                    <TouchableOpacity>
-                        <View style={style.success}>
-                            <Text style={style.text}>Ticket in active</Text>
-                        </View>
-                    </TouchableOpacity>
-                </View>
-                <View style={style.container2}>
-                    <Image source={ebv} />
-                    <Text style={text.schedule}>
-                        Monday, 14 June 2020 - 02:00pm
-                    </Text>
-                    <Text style={text.movie}>Avengers: End Game</Text>
-                    <View style={style.lineStyle1} />
-                    <View style={style.disabled}>
-                        <Text style={style.text}>Ticket used</Text>
+                {this.props.transaction.ticketHistory.map((data) => (
+                    <View style={style.container2}>
+                        <Image
+                            style={style.gede}
+                            source={{uri: data.image}}
+                            resizeMode="contain"
+                        />
+                        <Text>{data.address}</Text>
+                        <Text style={text.schedule}>
+                            {data.date} - {data.showTimes}
+                        </Text>
+                        <Text style={text.movie}>{data.movieName}</Text>
+                        <View style={style.lineStyle1} />
+                        <Text>{this.props.showDate}</Text>
+
+                        {this.dateTicketCompare(data.date) ? (
+                            <View style={style.success}>
+                                <Text style={style.text}>Ticket is active</Text>
+                            </View>
+                        ) : (
+                            <View style={style.disabled}>
+                                <Text style={style.text}>Ticket expired</Text>
+                            </View>
+                        )}
                     </View>
-                </View>
+                ))}
             </ScrollView>
         );
     }
 }
 
-const mapStateToProps = (state) => ({auth: state.auth});
+const mapStateToProps = (state) => ({
+    auth: state.auth,
+    transaction: state.transaction,
+});
 
-const mapDispatchToProps = {updateProfileDetails, getUser};
+const mapDispatchToProps = {updateProfileDetails, getUser, getTicketHistory};
 
 const DetailsAccountConnected = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(DetailsAccount);
+
+const OrderHistoryConnected = connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(OrderHistory);
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -406,7 +432,10 @@ export default function Profile() {
                 name="Details Account"
                 component={DetailsAccountConnected}
             />
-            <Tab.Screen name="Order History" component={OrderHistory} />
+            <Tab.Screen
+                name="Order History"
+                component={OrderHistoryConnected}
+            />
         </Tab.Navigator>
     );
 }
@@ -420,6 +449,10 @@ const style = StyleSheet.create({
         paddingBottom: 80,
         backgroundColor: 'white',
         borderRadius: 15,
+    },
+    gede: {
+        height: 100,
+        width: 100,
     },
     container2: {
         marginHorizontal: 24,

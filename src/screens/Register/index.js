@@ -21,11 +21,15 @@ import FbIcon from '../../assets/icon-facebook.png';
 
 import {register} from '../../redux/actions/auth';
 
+import {validatePassword, validateEmail} from '../../helpers/validation';
+
 class Register extends Component {
     state = {
         visible: true,
         email: '',
         password: '',
+        messagePassword: '',
+        messageEmail: '',
     };
 
     doRegister = async () => {
@@ -40,10 +44,28 @@ class Register extends Component {
         } else {
             showMessage({
                 message: 'Failed',
-                description: 'Failed to register an account',
+                description: `${this.props.auth.errorMsg}`,
                 type: 'danger',
             });
         }
+    };
+
+    handlePasswordChange = (password) => {
+        const {valid, message} = validatePassword(password);
+        if (valid) {
+            this.setState({password: password});
+        }
+        this.setState({password: password});
+        this.setState({messagePassword: message});
+    };
+
+    handleEmailChange = (email) => {
+        const {valid, message} = validateEmail(email);
+        if (valid) {
+            this.setState({email: email});
+        }
+        this.setState({email: email});
+        this.setState({messageEmail: message});
     };
 
     render() {
@@ -64,9 +86,14 @@ class Register extends Component {
                             style={style.form}
                             keyboardType="email-address"
                             placeholder="write your email"
-                            onChangeText={(email) => this.setState({email})}
+                            onChangeText={(email) =>
+                                this.handleEmailChange(email)
+                            }
                         />
                     </View>
+                    <Text style={style.validation}>
+                        {this.state.messageEmail}
+                    </Text>
 
                     <Text>Password</Text>
                     <View style={style.form}>
@@ -75,7 +102,7 @@ class Register extends Component {
                             placeholder="write your password"
                             secureTextEntry={this.state.visible}
                             onChangeText={(password) =>
-                                this.setState({password})
+                                this.handlePasswordChange(password)
                             }
                         />
                         <TouchableOpacity
@@ -85,6 +112,9 @@ class Register extends Component {
                             <Icon name="eye" size={25} />
                         </TouchableOpacity>
                     </View>
+                    <Text style={style.validation}>
+                        {this.state.messagePassword}
+                    </Text>
 
                     <TouchableOpacity onPress={this.doRegister}>
                         <View style={button.primary}>
@@ -139,6 +169,10 @@ const style = StyleSheet.create({
         marginTop: 46.48,
         marginBottom: 41,
     },
+    validation: {
+        color: '#f54254',
+        marginBottom: 15,
+    },
     form: {
         borderRadius: 4,
         borderWidth: 1,
@@ -146,7 +180,6 @@ const style = StyleSheet.create({
         borderColor: '#DEDEDE',
         paddingHorizontal: 20,
         marginTop: 12,
-        marginBottom: 25,
         flexDirection: 'row',
         alignItems: 'center',
     },

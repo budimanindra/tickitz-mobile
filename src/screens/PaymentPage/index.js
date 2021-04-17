@@ -45,6 +45,7 @@ export class PaymentPage extends Component {
     };
 
     doPay = async () => {
+        const {cinemaImage, cinemaAddress} = this.props.route.params;
         if (this.props.auth.token === null) {
             this.setModalVisible(true);
         } else {
@@ -56,13 +57,12 @@ export class PaymentPage extends Component {
                 'Ticket Purchased',
                 'Yay, Have a great time !',
             );
-            this.props.navigation.navigate('TicketResults');
+            this.props.navigation.navigate('TicketResults', {
+                cinemaImage,
+                cinemaAddress,
+            });
         }
     };
-
-    // setModalVisible = (visible) => {
-    //     this.setState({modalVisible: visible});
-    // };
 
     render() {
         const {modalVisible} = this.state;

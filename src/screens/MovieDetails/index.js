@@ -340,6 +340,8 @@ export class MovieDetails extends Component {
                                                   date: this.state
                                                       .selectedDateString,
                                                   price: cinema.priceWeekend,
+                                                  cinemaImage: cinema.image,
+                                                  cinemaAddress: cinema.address,
                                               },
                                           )
                                         : this.alert()
